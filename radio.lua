@@ -11,11 +11,11 @@ function update_radio()
  if game_state!=1 and game_state!=2 then return end
 
  local can_tune=not pause_story or story_state==3 or story_state==4 or story_state==60
- if can_tune and btn(5) then
+ if can_tune and btn(4) then
   radio_offset=min(275,radio_offset+0.5)
   if story_state==3 then advance_story() end
  end
- if can_tune and btn(4) then
+ if can_tune and btn(5) then
   radio_offset=max(0,radio_offset-0.5)
   if story_state==60 and radio_offset==0 then advance_story() end
  end
@@ -59,6 +59,7 @@ function update_radio()
   end
   if story_state==4 and signal_strength>0.5 then advance_story() end
   if d<52 then
+   stop_autopilot()
    ship.orbit=ship.target
    if in_list(radio_cues,story_state) then
     advance_story()
@@ -78,6 +79,10 @@ function update_radio()
  end
 end
 
+function radio_dial_angle()
+ return (0.5+radio_offset/275*0.5)%1
+end
+
 function draw_radio()
  rectfill(2,83,36,109,6)
  rectfill(4,85,34,107,5)
@@ -87,7 +92,7 @@ function draw_radio()
  end
  circfill(27,94,8,1)
  circ(27,94,7,7)
- local a=0.5-radio_offset/275*0.5
+ local a=radio_dial_angle()
  line(27,94,27+cos(a)*6,94+sin(a)*6,9)
  rectfill(20,103,32,105,1)
  if radio_offset>0 then

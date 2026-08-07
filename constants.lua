@@ -8,13 +8,13 @@ cy=58
 story_text={
  "it's all gone; it must be.",
  "...and it's been weeks since i touched these controls.",
- "( o/x control the radio )",
- "just turn the radio on. ( press x )",
- "wait, this isn't just static! ( tune with x )",
+ "( o turns radio left / x turns it right )",
+ "just turn the radio on. ( press o )",
+ "wait, this isn't just static! ( tune with o )",
  "there must be someone out there...",
  "...somewhere. (check the corner map if you get lost)",
  "(find towers by tuning the radio, then follow the sonar)",
- "it's time to start looking. ( left/right + up to fly! )",
+ "(left/right + up fly; double-tap up = autopilot)",
  "hmm; there's nobody here,",
  "... but there's more on the radio.",
  "if i shut this thing down, i'll hear more radio signals.",
@@ -66,7 +66,7 @@ story_text={
  "( press down )",
  "...",
  "it wasn't you.",
- "( turn the radio off with o )"
+ "( turn the radio off with x )"
 }
 
 story_pause={

@@ -2,11 +2,17 @@ function init_ship()
  ship={
   x=world_size/2+32,y=world_size/2+32,
   vx=0,vy=0,angle=0,thrust=0,target=nil,orbit=nil,
-  sonar_tick=0,sonar_period=90,engine_tick=0,particles={}
+  sonar_tick=0,sonar_period=90,engine_tick=0,particles={},
+  autopilot=false,up_tap_frames=0,up_was_down=false
  }
  for i=1,48 do
   add(ship.particles,{x=cx,y=cy,life=0,maxlife=1,vx=0,vy=0,col=8})
  end
+end
+
+function stop_autopilot()
+ ship.autopilot=false
+ ship.up_tap_frames=0
 end
 
 function update_ship()
@@ -20,7 +26,24 @@ function update_ship()
  if can_fly and btn(0) then ship.angle=(ship.angle-0.006)%1 end
  if can_fly and btn(1) then ship.angle=(ship.angle+0.006)%1 end
 
- local firing=can_fly and btn(2)
+ local up_down=btn(2)
+ local up_pressed=up_down and not ship.up_was_down
+ if up_pressed then
+  if ship.autopilot then
+   stop_autopilot()
+  elseif can_fly then
+   if ship.up_tap_frames>0 then
+    ship.autopilot=true
+    ship.up_tap_frames=0
+   else
+    ship.up_tap_frames=18
+   end
+  end
+ end
+ ship.up_was_down=up_down
+ if ship.up_tap_frames>0 then ship.up_tap_frames-=1 end
+
+ local firing=can_fly and (up_down or ship.autopilot)
  if firing then
   ship.engine_tick+=1
   ship.vx=clamp(ship.vx-sin(ship.angle)*0.006,-0.85,0.85)

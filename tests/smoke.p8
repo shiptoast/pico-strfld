@@ -75,7 +75,7 @@ function _init()
  check(radio_offset>0 and radio_on,"checkpoint finale radio remains on")
  set_story(60)
  radio_offset=0.5
- poke(0x5f4c,16)
+ poke(0x5f4c,32)
  update_radio()
  poke(0x5f4c,0)
  check(game_state==2,"checkpoint preserves radio-off ending")
@@ -225,6 +225,84 @@ function _init()
  update_ship()
  poke(0x5f4c,0)
  check(abs(ship.vx)+abs(ship.vy)>0,"thrust input")
+
+ init_ship()
+ set_story(8)
+ local previous_dial_x=nil
+ for sample=0,10 do
+  radio_offset=sample*27.5
+  local sample_angle=radio_dial_angle()
+  local sample_x=cos(sample_angle)
+  local sample_y=sin(sample_angle)
+  check(sample_y<=0.001,"dial stays on top arc "..sample)
+  if previous_dial_x then
+   check(sample_x>=previous_dial_x,"dial sweeps left to right "..sample)
+  end
+  previous_dial_x=sample_x
+ end
+ radio_offset=0
+ check(abs(cos(radio_dial_angle())+1)<0.001,"dial starts at left endpoint")
+ radio_offset=275
+ check(abs(cos(radio_dial_angle())-1)<0.001,"dial ends at right endpoint")
+
+ radio_offset=100
+ local dial_x=cos(radio_dial_angle())
+ poke(0x5f4c,16)
+ update_radio()
+ poke(0x5f4c,0)
+ check(radio_offset==100.5,"o tunes counterclockwise")
+ check(cos(radio_dial_angle())>dial_x,"o moves dial right across top arc")
+ local o_x=cos(radio_dial_angle())
+ poke(0x5f4c,32)
+ update_radio()
+ poke(0x5f4c,0)
+ check(radio_offset==100,"x tunes clockwise")
+ check(cos(radio_dial_angle())<o_x,"x moves dial left across top arc")
+
+ init_ship()
+ set_story(8)
+ poke(0x5f4c,4)
+ update_ship()
+ poke(0x5f4c,0)
+ update_ship()
+ check(not ship.autopilot,"single up remains manual")
+ poke(0x5f4c,4)
+ update_ship()
+ check(ship.autopilot,"double up engages autopilot")
+ poke(0x5f4c,0)
+ local auto_speed=dist2(0,0,ship.vx,ship.vy)
+ update_ship()
+ check(ship.autopilot,"engaging tap does not cancel autopilot")
+ check(dist2(0,0,ship.vx,ship.vy)>auto_speed,"autopilot applies thrust")
+ poke(0x5f4c,4)
+ update_ship()
+ check(not ship.autopilot,"next up disengages autopilot")
+ poke(0x5f4c,0)
+ update_ship()
+
+ init_ship()
+ set_story(8)
+ poke(0x5f4c,4)
+ for i=1,20 do update_ship() end
+ check(not ship.autopilot,"held up does not count as double tap")
+ poke(0x5f4c,0)
+ update_ship()
+ init_world()
+ poke(0x5f4c,4)
+ update_ship()
+ poke(0x5f4c,0)
+ update_ship()
+ poke(0x5f4c,4)
+ update_ship()
+ poke(0x5f4c,0)
+ update_ship()
+ check(ship.autopilot,"autopilot reengages")
+ radio_offset=artifacts[1].freq
+ ship.x=artifacts[1].x
+ ship.y=artifacts[1].y+20
+ update_radio()
+ check(ship.orbit==artifacts[1],"autopilot planet arrival")
+ check(not ship.autopilot,"planet arrival disengages autopilot")
 
  local a=artifacts[1]
  a.rot=0

@@ -13,8 +13,9 @@ development lives in the cartridge and Lua files at the repository root.
 ## Controls
 
 - Left / right: rotate the ship.
-- Up: thrust.
-- O / X: tune the radio down / up.
+- Up: thrust; double-tap to engage autopilot, then press Up again to disengage.
+  Autopilot also disengages when the ship reaches a planet interaction.
+- O / X: turn the radio dial counterclockwise / clockwise (tune up / down).
 - Down: advance dialogue or shut down an artifact while in close orbit.
 - Pause menu, `checkpoint N/11`: advance the playtest state by one completed
   planet, capped at all eleven. This is a testing shortcut, not story input;
@@ -71,7 +72,8 @@ The smoke cartridge covers repeated checkpoint advances and their cap, coherent
 artifact/radio/ship reset state, the preserved radio-off ending, all eleven
 proximity gates, paused-dialogue orbit, two-stage text reveal/advance, sustained
 orbit momentum, four cardinal orbit headings, one natural artifact shutdown,
-the finale cue and transition, ship accents, artifact rotation, and basic flight input. A passing run prints
+both radio tuning directions, autopilot engagement/disengagement, the finale cue
+and transition, ship accents, artifact rotation, and basic flight input. A passing run prints
 `starfield smoke: passed` before shutting down.
 
 Before publishing a release, export and test from the exact commit being

@@ -31,8 +31,9 @@ artifact discovery instead.
 ## Controls
 
 - Left / right: rotate.
-- Up: thrust.
-- O / X: tune down / up.
+- Up: thrust; double-tap to engage autopilot, then press Up again to disengage.
+  Autopilot also disengages when the ship reaches a planet interaction.
+- O / X: turn the radio dial counterclockwise / clockwise (tune up / down).
 - Down: advance story or shut down an artifact while in close orbit.
 - Pause menu: advance the playtest checkpoint by one completed planet, capped
   at eleven. The shortcut resets transient artifact, radio, target, and orbit

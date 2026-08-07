@@ -56,6 +56,7 @@ function set_playtest_checkpoint(count)
  ship.vx=0
  ship.vy=0
  ship.thrust=0
+ clear_particles()
  stop_autopilot()
  ship.up_was_down=false
  ship.sonar_tick=0

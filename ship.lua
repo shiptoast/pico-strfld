@@ -15,6 +15,17 @@ function stop_autopilot()
  ship.up_tap_frames=0
 end
 
+function clear_particles()
+ for p in all(ship.particles) do
+  p.x=cx
+  p.y=cy
+  p.vx=0
+  p.vy=0
+  p.life=p.maxlife
+  p.col=0
+ end
+end
+
 function update_ship()
  if game_state==0 or game_state>=3 then
   ship.angle=0.145

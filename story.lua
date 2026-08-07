@@ -28,6 +28,12 @@ function advance_story()
  set_story(story_state+1)
 end
 
+function start_flight()
+ clear_particles()
+ game_state=1
+ set_story(0)
+end
+
 function press_story_down()
  if story_scan<#story_text[story_state+1] then
   story_scan=#story_text[story_state+1]
@@ -44,8 +50,7 @@ function update_story()
  if game_state==0 then
   fade=max(0,fade-0.5)
   if fade==0 and btnp(3) then
-   game_state=1
-   set_story(0)
+   start_flight()
   end
   return
  end

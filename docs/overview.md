@@ -36,7 +36,8 @@ artifact discovery instead.
 - Down: advance story or shut down an artifact while in close orbit.
 - Pause menu: advance the playtest checkpoint by one completed planet, capped
   at eleven. The shortcut resets transient artifact, radio, target, and orbit
-  state while leaving the next search and the final radio-off interaction playable.
+  state while leaving the next search and the final radio-off interaction
+  playable. Human and agent playtesters can use it to reach later story beats.
 
 The mapping consumes PICO-8's six buttons while retaining the six independent
 actions from the keyboard original.

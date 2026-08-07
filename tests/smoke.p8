@@ -14,12 +14,28 @@ function check(ok,label)
  end
 end
 
+function visible_particle_count()
+ local count=0
+ for p in all(ship.particles) do
+  if p.col!=0 then count+=1 end
+ end
+ return count
+end
+
 function _init()
  srand(1986)
  init_story()
  init_ship()
  init_world()
  init_radio()
+
+ game_state=0
+ fade=0
+ for i=1,40 do update_ship() end
+ check(visible_particle_count()>0,"title exhaust active")
+ start_flight()
+ check(game_state==1,"title enters flight")
+ check(visible_particle_count()==0,"title exhaust clears for flight")
 
  check(#story_text==61,"story count")
  check(#story_pause==61,"pause count")
@@ -28,6 +44,10 @@ function _init()
 
  game_state=1
  for count=1,#artifacts do
+  pause_story=false
+  ship.thrust=1
+  for i=1,24 do update_particles(true) end
+  check(visible_particle_count()>0,"checkpoint has exhaust "..count)
   local stale=artifacts[count]
   stale.found=true
   stale.shutdown=77
@@ -44,6 +64,7 @@ function _init()
   static_tick=99
 
   advance_playtest_checkpoint()
+  check(visible_particle_count()==0,"checkpoint clears exhaust "..count)
   check(completed_planets()==count,"checkpoint count "..count)
   check(story_state==artifact_cues[count]+1,"checkpoint story "..count)
   check(game_state==1,"checkpoint stays in play "..count)

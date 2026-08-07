@@ -27,6 +27,65 @@ function _init()
  check(#stars==150,"star count")
 
  game_state=1
+ for count=1,#artifacts do
+  local stale=artifacts[count]
+  stale.found=true
+  stale.shutdown=77
+  stale.flicker=false
+  stale.visible=true
+  ship.target=stale
+  ship.orbit=stale
+  ship.vx=1
+  ship.vy=-1
+  radio_offset=stale.freq
+  signal_strength=1
+  radio_on=true
+  broadcast_tick=99
+  static_tick=99
+
+  advance_playtest_checkpoint()
+  check(completed_planets()==count,"checkpoint count "..count)
+  check(story_state==artifact_cues[count]+1,"checkpoint story "..count)
+  check(game_state==1,"checkpoint stays in play "..count)
+  check(not ship.target and not ship.orbit,"checkpoint clears ship state "..count)
+  check(ship.vx==0 and ship.vy==0,"checkpoint clears velocity "..count)
+  check(signal_strength==0 and broadcast_tick==0 and static_tick==0,"checkpoint clears radio state "..count)
+
+  for i=1,#artifacts do
+   local a=artifacts[i]
+   check(a.off==(i<=count),"checkpoint artifact off "..count..":"..i)
+   check(not a.found and a.flicker and not a.visible,"checkpoint artifact transient "..count..":"..i)
+   check(a.shutdown==(i<=count and 180 or 0),"checkpoint artifact shutdown "..count..":"..i)
+   check(a.col==(i<=count and 5 or a.base_col),"checkpoint artifact color "..count..":"..i)
+  end
+
+  if count<#artifacts then
+   local next_artifact=artifacts[count+1]
+   radio_offset=next_artifact.freq
+   update_radio()
+   check(ship.target==next_artifact,"checkpoint next search "..count)
+  end
+ end
+
+ advance_playtest_checkpoint()
+ advance_playtest_checkpoint()
+ check(completed_planets()==11,"checkpoint cap")
+ check(story_state==58,"checkpoint cap story")
+ check(game_state==1,"checkpoint does not skip ending")
+ check(radio_offset>0 and radio_on,"checkpoint finale radio remains on")
+ set_story(60)
+ radio_offset=0.5
+ poke(0x5f4c,16)
+ update_radio()
+ poke(0x5f4c,0)
+ check(game_state==2,"checkpoint preserves radio-off ending")
+
+ init_story()
+ init_ship()
+ init_world()
+ init_radio()
+
+ game_state=1
  set_story(0)
  story_hold=0
  story_scan=3
@@ -134,6 +193,11 @@ function _init()
  for i=1,180 do update_world() end
  check(artifacts[1].off,"artifact shutdown")
  check(story_state==13,"shutdown gate")
+ check(completed_planets()==1,"natural checkpoint count")
+ advance_playtest_checkpoint()
+ check(completed_planets()==2,"natural then shortcut advances")
+ check(artifacts[2].off and not artifacts[3].off,"natural shortcut boundary")
+ check(story_state==artifact_cues[2]+1,"natural shortcut story")
 
  set_story(60)
  advance_story()

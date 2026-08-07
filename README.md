@@ -16,6 +16,8 @@ development lives in the cartridge and Lua files at the repository root.
 - Up: thrust.
 - O / X: tune the radio down / up.
 - Down: advance dialogue or shut down an artifact while in close orbit.
+- Pause menu, `checkpoint N/11`: advance the playtest state by one completed
+  planet, capped at all eleven. This is a testing shortcut, not story input.
 
 Dialogue uses a two-stage Down action. If text is still typing, the first press
 reveals the complete block without advancing it. A later press advances.
@@ -64,10 +66,11 @@ timeout 8s env SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy \
   "$PICO8_BIN" -run tests/smoke.p8
 ```
 
-The smoke cartridge covers all eleven proximity gates, paused-dialogue orbit,
-two-stage text reveal/advance, sustained orbit momentum, four cardinal orbit
-headings, one artifact shutdown, the finale cue and transition, ship accents,
-artifact rotation, and basic flight input. A passing run prints
+The smoke cartridge covers repeated checkpoint advances and their cap, coherent
+artifact/radio/ship reset state, the preserved radio-off ending, all eleven
+proximity gates, paused-dialogue orbit, two-stage text reveal/advance, sustained
+orbit momentum, four cardinal orbit headings, one natural artifact shutdown,
+the finale cue and transition, ship accents, artifact rotation, and basic flight input. A passing run prints
 `starfield smoke: passed` before shutting down.
 
 Before publishing a release, export and test from the exact commit being

@@ -22,11 +22,62 @@ function init_world()
   song+=1
   add(artifacts,{
    x=d[1],y=d[2],freq=d[3],col=d[4],
+   base_col=d[4],
    song=song,
    size=36+flr(rnd(18)),rot=rnd(1),dir=rnd(1)<0.5 and -1 or 1,
    visible=false,found=false,off=false,shutdown=0,flicker=true
   })
  end
+end
+
+function completed_planets()
+ local count=0
+ for a in all(artifacts) do
+  if a.off then count+=1 end
+ end
+ return count
+end
+
+function set_playtest_checkpoint(count)
+ count=clamp(count,0,#artifacts)
+ for i=1,#artifacts do
+  local a=artifacts[i]
+  local completed=i<=count
+  a.off=completed
+  a.found=false
+  a.shutdown=completed and 180 or 0
+  a.flicker=true
+  a.visible=false
+  a.col=completed and 5 or a.base_col
+ end
+
+ ship.target=nil
+ ship.orbit=nil
+ ship.vx=0
+ ship.vy=0
+ ship.thrust=0
+ ship.sonar_tick=0
+ ship.sonar_period=90
+ radio_offset=count==#artifacts and artifacts[#artifacts].freq or 0
+ signal_strength=0
+ radio_on=radio_offset>0
+ static_tick=0
+ broadcast_tick=0
+ game_state=1
+ fade=0
+ finale_tick=0
+ if count>0 then set_story(artifact_cues[count]+1)
+ else set_story(radio_cues[1]) end
+end
+
+function refresh_playtest_menu()
+ local count=completed_planets()
+ menuitem(1,"checkpoint "..count.."/"..#artifacts,advance_playtest_checkpoint)
+end
+
+function advance_playtest_checkpoint()
+ set_playtest_checkpoint(min(#artifacts,completed_planets()+1))
+ refresh_playtest_menu()
 end
 
 function update_world()
@@ -51,6 +102,7 @@ function update_world()
     a.col=5
     ship.target=nil
     ship.orbit=nil
+    refresh_playtest_menu()
     advance_story()
    end
   end

@@ -31,7 +31,9 @@ PICO8_BIN=/path/to/pico8
 ```
 
 The checked-in `starfield.html` and `starfield.js` files are a browser export.
-Open `starfield.html` through a local web server to play that build.
+[Play the published build](https://shiptoast.github.io/pico-strfld/starfield.html),
+or open `starfield.html` through a local web server to test the checked-in
+files.
 
 ## Source map
 
@@ -89,7 +91,5 @@ launch.
   intentionally jumps between story states.
 - Add automated browser coverage or a documented release checklist for
   desktop/touch controls, fresh export, and Lua-to-export hash parity.
-- Choose durable public demo or release hosting. The current hosted build is a
-  machine preview, not a release pipeline.
 
 This is not an action game.

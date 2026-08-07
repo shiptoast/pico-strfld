@@ -17,7 +17,8 @@ development lives in the cartridge and Lua files at the repository root.
 - O / X: tune the radio down / up.
 - Down: advance dialogue or shut down an artifact while in close orbit.
 - Pause menu, `checkpoint N/11`: advance the playtest state by one completed
-  planet, capped at all eleven. This is a testing shortcut, not story input.
+  planet, capped at all eleven. This is a testing shortcut, not story input;
+  human and agent playtesters can use it to reach later story beats quickly.
 
 Dialogue uses a two-stage Down action. If text is still typing, the first press
 reveals the complete block without advancing it. A later press advances.

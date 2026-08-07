@@ -80,7 +80,7 @@ function update_radio()
 end
 
 function radio_dial_angle()
- return (0.5+radio_offset/275*0.5)%1
+ return (0.5-radio_offset/275*0.5)%1
 end
 
 function draw_radio()

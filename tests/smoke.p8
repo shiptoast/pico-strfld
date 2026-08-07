@@ -228,19 +228,36 @@ function _init()
 
  init_ship()
  set_story(8)
+ local previous_dial_x=nil
+ for sample=0,10 do
+  radio_offset=sample*27.5
+  local sample_angle=radio_dial_angle()
+  local sample_x=cos(sample_angle)
+  local sample_y=sin(sample_angle)
+  check(sample_y<=0.001,"dial stays on top arc "..sample)
+  if previous_dial_x then
+   check(sample_x>=previous_dial_x,"dial sweeps left to right "..sample)
+  end
+  previous_dial_x=sample_x
+ end
+ radio_offset=0
+ check(abs(cos(radio_dial_angle())+1)<0.001,"dial starts at left endpoint")
+ radio_offset=275
+ check(abs(cos(radio_dial_angle())-1)<0.001,"dial ends at right endpoint")
+
  radio_offset=100
- local dial_angle=radio_dial_angle()
+ local dial_x=cos(radio_dial_angle())
  poke(0x5f4c,16)
  update_radio()
  poke(0x5f4c,0)
  check(radio_offset==100.5,"o tunes counterclockwise")
- check(radio_dial_angle()>dial_angle,"o turns dial counterclockwise")
- local o_angle=radio_dial_angle()
+ check(cos(radio_dial_angle())>dial_x,"o moves dial right across top arc")
+ local o_x=cos(radio_dial_angle())
  poke(0x5f4c,32)
  update_radio()
  poke(0x5f4c,0)
  check(radio_offset==100,"x tunes clockwise")
- check(radio_dial_angle()<o_angle,"x turns dial clockwise")
+ check(cos(radio_dial_angle())<o_x,"x moves dial left across top arc")
 
  init_ship()
  set_story(8)

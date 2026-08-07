@@ -34,6 +34,9 @@ artifact discovery instead.
 - Up: thrust.
 - O / X: tune down / up.
 - Down: advance story or shut down an artifact while in close orbit.
+- Pause menu: advance the playtest checkpoint by one completed planet, capped
+  at eleven. The shortcut resets transient artifact, radio, target, and orbit
+  state while leaving the next search and the final radio-off interaction playable.
 
 The mapping consumes PICO-8's six buttons while retaining the six independent
 actions from the keyboard original.
@@ -61,9 +64,10 @@ timeout 3s env SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy \
   "$PICO8_BIN" -run starfield.p8
 ```
 
-The cartridge-native progression smoke test checks collection sizes, first
-signal acquisition, map reveal, close orbit, artifact shutdown/story advance,
-and the complete ending transition:
+The cartridge-native progression smoke test checks repeated checkpoint
+advances and their cap, coherent world resets, the preserved radio-off ending,
+collection sizes, signal acquisition, map reveal, close orbit, artifact
+shutdown/story advance, and the complete ending transition:
 
 ```sh
 timeout 8s env SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy \

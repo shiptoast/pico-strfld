@@ -4,6 +4,7 @@ function _init()
  init_ship()
  init_world()
  init_radio()
+ refresh_playtest_menu()
 end
 
 function _update60()

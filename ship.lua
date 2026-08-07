@@ -86,11 +86,14 @@ end
 function reset_particle(p)
  p.x=cx+sin(ship.angle)*5
  p.y=cy+cos(ship.angle)*5
- local spread=(rnd(1)-0.5)*0.6
- p.vx=sin(ship.angle)*(0.4+rnd(0.8))+spread
- p.vy=cos(ship.angle)*(0.4+rnd(0.8))+spread
+ local strength=max(0.25,ship.thrust)
+ if game_state==0 or game_state>=3 then strength=1 end
+ local speed=(0.55+rnd(0.75))*strength
+ local spread=(rnd(1)-0.5)*0.35*strength
+ p.vx=sin(ship.angle)*speed+cos(ship.angle)*spread
+ p.vy=cos(ship.angle)*speed-sin(ship.angle)*spread
  p.life=0
- p.maxlife=8+flr(rnd(18))*max(0.25,ship.thrust)
+ p.maxlife=18+flr(rnd(43))*strength
 end
 
 function update_particles(firing)
@@ -98,8 +101,8 @@ function update_particles(firing)
   p.life+=1
   p.x+=p.vx
   p.y+=p.vy
-  p.vx*=0.94
-  p.vy*=0.94
+  p.vx*=0.985
+  p.vy*=0.985
   local q=p.life/max(1,p.maxlife)
   p.col=q<0.25 and 7 or (q<0.55 and 10 or (q<0.8 and 9 or 8))
   if p.life>=p.maxlife then

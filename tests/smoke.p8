@@ -226,6 +226,35 @@ function _init()
  poke(0x5f4c,0)
  check(abs(ship.vx)+abs(ship.vy)>0,"thrust input")
 
+ game_state=0
+ init_ship()
+ for i=1,48 do update_ship() end
+ local title_trail=0
+ for p in all(ship.particles) do
+  if p.col!=0 then title_trail=max(title_trail,dist2(cx,cy,p.x,p.y)) end
+ end
+ check(title_trail>18,"title exhaust reaches beyond hull")
+
+ game_state=1
+ init_ship()
+ ship.thrust=1
+ ship.angle=0
+ for i=1,24 do update_particles(true) end
+ ship.angle=0.18
+ for i=1,24 do update_particles(true) end
+ local trail_min_x=128
+ local trail_max_x=0
+ local trail_max_y=0
+ for p in all(ship.particles) do
+  if p.col!=0 then
+   trail_min_x=min(trail_min_x,p.x)
+   trail_max_x=max(trail_max_x,p.x)
+   trail_max_y=max(trail_max_y,p.y)
+  end
+ end
+ check(trail_max_y-cy>12,"turning exhaust retains old heading")
+ check(trail_max_x-trail_min_x>12,"turning exhaust visibly whips")
+
  init_ship()
  set_story(8)
  local previous_dial_x=nil

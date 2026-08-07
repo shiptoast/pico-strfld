@@ -1,0 +1,116 @@
+function init_world()
+ stars={}
+ for i=1,150 do
+  add(stars,{
+   x=rnd(sw),y=rnd(112),z=0.35+rnd(1.4),
+   size=flr(rnd(2))+1,
+   col=rnd(1)<0.15 and (8+flr(rnd(7))) or 6
+  })
+ end
+
+ -- Fixed counterparts to the original random broadcasts ensure that
+ -- every cartridge is completable while retaining a large search space.
+ local data={
+  {2220,1880,24,8},{1680,2750,48,9},{2860,2420,72,10},
+  {3150,1250,96,11},{940,1720,120,12},{3520,3300,144,13},
+  {1180,3450,168,14},{2600,3660,192,8},{620,740,216,9},
+  {3750,680,240,10},{2050,460,264,11}
+ }
+ artifacts={}
+ local song=0
+ for d in all(data) do
+  song+=1
+  add(artifacts,{
+   x=d[1],y=d[2],freq=d[3],col=d[4],
+   song=song,
+   size=36+flr(rnd(18)),rot=rnd(1),dir=rnd(1)<0.5 and -1 or 1,
+   visible=false,found=false,off=false,shutdown=0,flicker=true
+  })
+ end
+end
+
+function update_world()
+ for s in all(stars) do
+  s.x-=ship.vx*s.z
+  s.y-=ship.vy*s.z
+  if s.x<0 then s.x+=sw end
+  if s.x>=sw then s.x-=sw end
+  if s.y<0 then s.y+=112 end
+  if s.y>=112 then s.y-=112 end
+ end
+
+ for a in all(artifacts) do
+  a.rot=(a.rot+0.001*a.dir)%1
+  if a.found and not a.off then
+   a.shutdown+=1
+   a.flicker=flr(a.shutdown/3)%2==0
+   if a.shutdown==1 then sfx(3) end
+   if a.shutdown>=180 then
+    a.off=true
+    a.flicker=true
+    a.col=5
+    ship.target=nil
+    ship.orbit=nil
+    advance_story()
+   end
+  end
+ end
+end
+
+function draw_stars(front)
+ for s in all(stars) do
+  if (s.z>1)==front then
+   if s.size==1 then pset(s.x,s.y,s.col)
+   else rectfill(s.x-1,s.y-1,s.x,s.y,s.col) end
+  end
+ end
+end
+
+function artifact_screen(a)
+ return cx+(a.x-ship.x),cy+(a.y-ship.y)
+end
+
+function draw_artifacts()
+ for a in all(artifacts) do
+  local x,y=artifact_screen(a)
+  if abs(x-cx)<170 and abs(y-cy)<150 and a.flicker then
+   draw_artifact(a,x,y)
+  end
+ end
+end
+
+function artifact_point(a,x,y,px,py)
+ local rx,ry=rotpt(px,py,a.rot)
+ return x+rx,y+ry
+end
+
+function draw_artifact(a,x,y)
+ local r=max(8,min(22,a.size/2))
+ circfill(x,y,r,0)
+ circfill(x,y,r-1,a.col)
+ circfill(x,y,max(2,r-5),a.off and 1 or 7)
+ local blx,bly=artifact_point(a,x,y,-r/2,-r)
+ local brx,bry=artifact_point(a,x,y,r/2,-r)
+ local lx,ly=artifact_point(a,x,y,-2*r,-2*r)
+ local rx,ry=artifact_point(a,x,y,2*r,-2*r)
+ local tx,ty=artifact_point(a,x,y,0,-3*r)
+ line(blx,bly,lx,ly,a.col)
+ line(brx,bry,rx,ry,a.col)
+ line(lx,ly,rx,ry,a.col)
+ line(lx,ly,tx,ty,a.col)
+ line(rx,ry,tx,ty,a.col)
+ circfill(tx,ty,1,a.off and 5 or 10)
+end
+
+function draw_minimap()
+ rectfill(3,3,29,29,7)
+ rectfill(5,5,27,27,0)
+ local mx=5+ship.x/world_size*22
+ local my=5+ship.y/world_size*22
+ if flr(t()*2)%2==0 then rectfill(mx-1,my-1,mx+1,my+1,7) end
+ for a in all(artifacts) do
+  if a.visible and not a.off then
+   pset(5+a.x/world_size*22,5+a.y/world_size*22,a.col)
+  end
+ end
+end

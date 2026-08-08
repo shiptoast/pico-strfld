@@ -278,6 +278,121 @@ function _init()
 
  ship.x=world_size/2
  ship.y=world_size/2
+ ship.target=artifacts[1]
+ ship.target.x=ship.x+100
+ ship.target.y=ship.y
+ radio_offset=ship.target.freq
+ ship.sonar_period=90
+ ship.sonar_bands={
+  {id=1,lane=0,r=17},
+  {id=2,lane=1,r=23},
+  {id=3,lane=2,r=11}
+ }
+ ship.sonar_next_id=4
+ cls()
+ draw_sonar()
+ local sonar_pixels=0
+ local sonar_miny=127
+ local sonar_maxy=0
+ local sonar_left=0
+ for py=0,127 do
+  for px=0,127 do
+   if pget(px,py)==12 then
+    sonar_pixels+=1
+    sonar_miny=min(sonar_miny,py)
+    sonar_maxy=max(sonar_maxy,py)
+    if px<cx then sonar_left+=1 end
+   end
+  end
+ end
+ check(sonar_pixels>45 and sonar_maxy-sonar_miny>24,"sonar renders broad bubble arcs")
+ check(sonar_left==0,"sonar stays target-directed")
+ for band in all(ship.sonar_bands) do
+  local sweep=(band.lane-1)/108
+  local d=band.r
+  local front_x=cx+cos(sweep)*d
+  local front_y=cy+sin(sweep)*d
+  check(pixel_near(front_x,front_y,12),"sonar renders staggered successive arc fronts")
+ end
+ local step=sonar_band_step()
+ check(abs(step-9/ship.sonar_period)<0.001,"sonar lifecycle keeps approved half speed")
+ ship.sonar_bands={
+  {id=101,lane=0,r=sonar_kill_radius-step/2},
+  {id=102,lane=1,r=14},
+  {id=103,lane=2,r=20}
+ }
+ ship.sonar_next_id=104
+ local survivor_r={14,20}
+ check(ship.sonar_bands[1].r+step>=sonar_kill_radius,"sonar expiring band reaches outer limit")
+ update_sonar_bands()
+ check(#ship.sonar_bands==3,"sonar lifecycle keeps three bands")
+ local expired=false
+ local replacements=0
+ for band in all(ship.sonar_bands) do
+  if band.id==101 then expired=true end
+  if band.id==104 and band.lane==0 and band.r==sonar_spawn_radius then replacements+=1 end
+  if band.id==102 then
+   check(abs(band.r-survivor_r[1]-step)<0.001,"sonar survivor advances at half speed 1")
+  end
+  if band.id==103 then
+   check(abs(band.r-survivor_r[2]-step)<0.001,"sonar survivor advances at half speed 2")
+  end
+ end
+ check(not expired,"sonar expired identity disappears")
+ check(replacements==1,"sonar spawns one inner replacement")
+ for first=0,1 do
+  for second=first+1,2 do
+   cls()
+   draw_sonar_front(0,48,first,12)
+   local before=0
+   for py=0,127 do
+    for px=0,127 do
+     if pget(px,py)==12 then before+=1 end
+    end
+   end
+   draw_sonar_front(0,48,second,11)
+   local after=0
+   for py=0,127 do
+    for px=0,127 do
+     if pget(px,py)==12 then after+=1 end
+    end
+   end
+   check(after==before,"sonar fronts avoid shared angular columns")
+  end
+ end
+ ship.sonar_bands={
+  {id=201,lane=0,r=17},
+  {id=202,lane=1,r=23},
+  {id=203,lane=2,r=11}
+ }
+ ship.target.x=ship.x
+ ship.target.y=ship.y+100
+ cls()
+ draw_sonar()
+ local sonar_minx=127
+ local sonar_maxx=0
+ local sonar_above=0
+ for py=0,127 do
+  for px=0,127 do
+   if pget(px,py)==12 then
+    sonar_minx=min(sonar_minx,px)
+    sonar_maxx=max(sonar_maxx,px)
+    if py<cy then sonar_above+=1 end
+   end
+  end
+ end
+ check(sonar_maxx-sonar_minx>24 and sonar_above==0,"sonar arcs follow turned target bearing")
+ ship.target=nil
+ cls()
+ draw_sonar()
+ sonar_pixels=0
+ for py=0,127 do
+  for px=0,127 do
+   if pget(px,py)==12 then sonar_pixels+=1 end
+  end
+ end
+ check(sonar_pixels==0,"sonar clears without a target")
+
  for a in all(artifacts) do a.visible=false end
  local marker_x=5+ship.x/world_size*22
  local marker_y=5+ship.y/world_size*22

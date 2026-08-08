@@ -59,8 +59,8 @@ function set_playtest_checkpoint(count)
  clear_particles()
  stop_autopilot()
  ship.up_was_down=false
- ship.sonar_tick=0
  ship.sonar_period=90
+ reset_sonar_bands()
  radio_offset=count==#artifacts and artifacts[#artifacts].freq or 0
  signal_strength=0
  radio_on=radio_offset>0

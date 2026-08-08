@@ -66,6 +66,15 @@ function visible_particle_count()
  return count
 end
 
+function star_style_counts()
+ local colored,large=0,0
+ for s in all(stars) do
+  if s.col!=6 then colored+=1 end
+  if s.size==2 then large+=1 end
+ end
+ return colored,large
+end
+
 function _init()
  srand(1986)
  init_story()
@@ -85,6 +94,11 @@ function _init()
  check(#story_pause==61,"pause count")
  check(#artifacts==11,"artifact count")
  check(#stars==150,"star count")
+ check(star_color_chance==0.05,"colored star chance")
+ check(star_large_chance==0.2,"large star chance")
+ local colored_stars,large_stars=star_style_counts()
+ check(colored_stars==11,"fixed-seed colored star rarity")
+ check(large_stars==27,"fixed-seed large star rarity")
 
  game_state=1
  for count=1,#artifacts do

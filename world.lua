@@ -154,33 +154,34 @@ end
 
 function draw_artifact_tower(a,x,y,r)
  local c=a.col
+ local inward=3
 
  -- tapered legs and two crossed lattice bays
- artifact_tower_line(a,x,y,-r/2,-r,0,-3*r,c)
- artifact_tower_line(a,x,y,r/2,-r,0,-3*r,c)
- artifact_tower_line(a,x,y,-r/2,-r,r/2,-r,c)
- artifact_tower_line(a,x,y,-3*r/8,-3*r/2,3*r/8,-3*r/2,c)
- artifact_tower_line(a,x,y,-r/4,-2*r, r/4,-2*r,c)
- artifact_tower_line(a,x,y,-r/8,-5*r/2,r/8,-5*r/2,c)
- artifact_tower_line(a,x,y,-r/2,-r,3*r/8,-3*r/2,c)
- artifact_tower_line(a,x,y,r/2,-r,-3*r/8,-3*r/2,c)
- artifact_tower_line(a,x,y,-3*r/8,-3*r/2,r/4,-2*r,c)
- artifact_tower_line(a,x,y,3*r/8,-3*r/2,-r/4,-2*r,c)
- artifact_tower_line(a,x,y,-r/4,-2*r,r/8,-5*r/2,c)
- artifact_tower_line(a,x,y,r/4,-2*r,-r/8,-5*r/2,c)
+ artifact_tower_line(a,x,y,-r/2,-r+inward,0,-3*r+inward,c)
+ artifact_tower_line(a,x,y,r/2,-r+inward,0,-3*r+inward,c)
+ artifact_tower_line(a,x,y,-r/2,-r+inward,r/2,-r+inward,c)
+ artifact_tower_line(a,x,y,-3*r/8,-3*r/2+inward,3*r/8,-3*r/2+inward,c)
+ artifact_tower_line(a,x,y,-r/4,-2*r+inward,r/4,-2*r+inward,c)
+ artifact_tower_line(a,x,y,-r/8,-5*r/2+inward,r/8,-5*r/2+inward,c)
+ artifact_tower_line(a,x,y,-r/2,-r+inward,3*r/8,-3*r/2+inward,c)
+ artifact_tower_line(a,x,y,r/2,-r+inward,-3*r/8,-3*r/2+inward,c)
+ artifact_tower_line(a,x,y,-3*r/8,-3*r/2+inward,r/4,-2*r+inward,c)
+ artifact_tower_line(a,x,y,3*r/8,-3*r/2+inward,-r/4,-2*r+inward,c)
+ artifact_tower_line(a,x,y,-r/4,-2*r+inward,r/8,-5*r/2+inward,c)
+ artifact_tower_line(a,x,y,r/4,-2*r+inward,-r/8,-5*r/2+inward,c)
 
  -- solid shaded surface hut from the original tower
  local house=a.off and 5 or 6
  local roof=a.off and 1 or 5
- artifact_tower_fill(a,x,y,-3*r/4,-r,-r/8,-3*r/4,house)
- for py=-5*r/4,-r do
-  local spread=(py+5*r/4)*7/4
+ artifact_tower_fill(a,x,y,-3*r/4,-r+inward,-r/8,-3*r/4+inward,house)
+ for py=-5*r/4+inward,-r+inward do
+  local spread=(py+5*r/4-inward)*7/4
   artifact_tower_line(a,x,y,-7*r/16-spread,py,-7*r/16+spread,py,roof)
  end
- artifact_tower_fill(a,x,y,-5*r/8,-15*r/16,-r/2,-7*r/8,0)
- artifact_tower_fill(a,x,y,-5*r/16,-15*r/16,-3*r/16,-3*r/4,c)
+ artifact_tower_fill(a,x,y,-5*r/8,-15*r/16+inward,-r/2,-7*r/8+inward,0)
+ artifact_tower_fill(a,x,y,-5*r/16,-15*r/16+inward,-3*r/16,-3*r/4+inward,c)
 
- local tx,ty=artifact_point(a,x,y,0,-3*r)
+ local tx,ty=artifact_point(a,x,y,0,-3*r+inward)
  circfill(tx,ty,2,a.off and 5 or 10)
 end
 

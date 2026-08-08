@@ -14,6 +14,15 @@ function check(ok,label)
  end
 end
 
+function pixel_near(x,y,col)
+ for py=y-1,y+1 do
+  for px=x-1,x+1 do
+   if pget(px,py)==col then return true end
+  end
+ end
+ return false
+end
+
 function visible_particle_count()
  local count=0
  for p in all(ship.particles) do
@@ -372,27 +381,27 @@ function _init()
  local stray_width=0
  local hut_pixels=0
  local beacon_pixels=0
- for py=cy-33,cy-23 do
+ for py=cy-30,cy-20 do
   for px=cx-3,cx+3 do
    if pget(px,py)==12 then lower_cross+=1 end
   end
  end
- for py=cy-42,cy-34 do
+ for py=cy-39,cy-31 do
   for px=cx-3,cx+3 do
    if pget(px,py)==12 then upper_cross+=1 end
   end
  end
- for py=cy-47,cy-26 do
+ for py=cy-44,cy-23 do
   for px=cx-24,cx+24 do
    if abs(px-cx)>12 and pget(px,py)==12 then stray_width+=1 end
   end
  end
- for py=cy-20,cy-12 do
+ for py=cy-17,cy-9 do
   for px=cx-14,cx do
    if pget(px,py)==6 or pget(px,py)==5 then hut_pixels+=1 end
   end
  end
- for py=cy-50,cy-46 do
+ for py=cy-47,cy-43 do
   for px=cx-2,cx+2 do
    if pget(px,py)==10 then beacon_pixels+=1 end
   end
@@ -402,8 +411,15 @@ function _init()
  check(hut_pixels>30,"artifact surface hut is solid")
  check(beacon_pixels>=13,"artifact beacon is materially enlarged")
 
+ local new_beacon_x,new_beacon_y=artifact_point(a,cx,cy,0,-45)
+ local old_beacon_x,old_beacon_y=artifact_point(a,cx,cy,0,-48)
+ local new_hut_x,new_hut_y=artifact_point(a,cx,cy,-10,-10)
+ local old_hut_x,old_hut_y=artifact_point(a,cx,cy,-10,-16)
+ check(pget(new_beacon_x,new_beacon_y)==10 and pget(old_beacon_x,old_beacon_y)!=10,"artifact beacon moves inward upright")
+ check(pget(new_hut_x,new_hut_y)==6 and pget(old_hut_x,old_hut_y)!=6,"artifact hut moves inward upright")
+
  local upright_join=0
- for py=-12,-8 do
+ for py=-9,-5 do
   local jx,jy=artifact_point(a,cx,cy,-4,py)
   if pget(jx,jy)!=0 then upright_join+=1 end
  end
@@ -412,8 +428,14 @@ function _init()
  a.rot=0.125
  cls()
  draw_artifact(a,cx,cy)
+ new_beacon_x,new_beacon_y=artifact_point(a,cx,cy,0,-45)
+ old_beacon_x,old_beacon_y=artifact_point(a,cx,cy,0,-48)
+ new_hut_x,new_hut_y=artifact_point(a,cx,cy,-10,-10)
+ old_hut_x,old_hut_y=artifact_point(a,cx,cy,-10,-16)
+ check(pget(new_beacon_x,new_beacon_y)==10 and pget(old_beacon_x,old_beacon_y)!=10,"artifact beacon moves inward rotated")
+ check(pixel_near(new_hut_x,new_hut_y,6) and pget(old_hut_x,old_hut_y)!=6,"artifact hut moves inward rotated")
  local rotated_join=0
- for py=-12,-8 do
+ for py=-9,-5 do
   local jx,jy=artifact_point(a,cx,cy,-4,py)
   if pget(jx,jy)!=0 then rotated_join+=1 end
  end

@@ -92,9 +92,12 @@ function set_playtest_finale_checkpoint()
 end
 
 function refresh_playtest_menu()
+ menuitem(1,playtest_checkpoint_label(),advance_playtest_checkpoint)
+end
+
+function playtest_checkpoint_label()
  local count=completed_planets()
- local label=finale_checkpoint and "checkpoint finale" or "checkpoint "..count.."/"..#artifacts
- menuitem(1,label,advance_playtest_checkpoint)
+ return finale_checkpoint and "checkpoint 12/11" or "checkpoint "..count.."/"..#artifacts
 end
 
 function advance_playtest_checkpoint()

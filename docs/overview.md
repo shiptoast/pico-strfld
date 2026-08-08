@@ -36,10 +36,11 @@ artifact discovery instead.
 - O / X: turn the radio dial counterclockwise / clockwise (tune up / down).
 - Down: advance story or shut down an artifact while in close orbit.
 - Pause menu: advance the playtest checkpoint through all eleven completed
-  planets, then select a distinct final checkpoint for the visible two-ship
-  ending. The 11/11 position still leaves the radio-off interaction playable.
-  Human and agent playtesters can use the final checkpoint to inspect both
-  ship-owned spark trails without changing the normal ending path.
+  planets, then advance once beyond the apparent maximum to `CHECKPOINT 12/11`
+  for the visible two-ship ending. The 11/11 position still leaves the radio-off
+  interaction playable. Human and agent playtesters can use the hidden overflow
+  checkpoint to inspect both ship-owned spark trails without changing the normal
+  ending path.
 
 The mapping consumes PICO-8's six buttons while retaining the six independent
 actions from the keyboard original.

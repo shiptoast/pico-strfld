@@ -34,6 +34,14 @@ function start_flight()
  set_story(0)
 end
 
+function enter_finale(show_now)
+ game_state=3
+ finale_tick=0
+ if show_now then fade=0 end
+ reset_finale_particles()
+ sfx(4,3)
+end
+
 function press_story_down()
  if story_scan<#story_text[story_state+1] then
   story_scan=#story_text[story_state+1]
@@ -58,9 +66,7 @@ function update_story()
  if game_state==2 then
   fade=min(128,fade+0.25)
   if fade>=128 then
-   game_state=3
-   finale_tick=0
-   sfx(4,3)
+   enter_finale(false)
   end
   return
  end

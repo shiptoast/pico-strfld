@@ -2,6 +2,7 @@ star_large_chance=0.2
 star_color_chance=0.05
 
 function init_world()
+ finale_checkpoint=false
  stars={}
  for i=1,150 do
   add(stars,{
@@ -43,6 +44,7 @@ end
 
 function set_playtest_checkpoint(count)
  count=clamp(count,0,#artifacts)
+ finale_checkpoint=false
  for i=1,#artifacts do
   local a=artifacts[i]
   local completed=i<=count
@@ -76,13 +78,31 @@ function set_playtest_checkpoint(count)
  else set_story(radio_cues[1]) end
 end
 
+function set_playtest_finale_checkpoint()
+ set_playtest_checkpoint(#artifacts)
+ finale_checkpoint=true
+ story_state=#story_text-1
+ pause_story=true
+ story_scan=#story_text[story_state+1]
+ story_hold=0
+ radio_offset=0
+ radio_on=false
+ signal_strength=0
+ enter_finale(true)
+end
+
 function refresh_playtest_menu()
  local count=completed_planets()
- menuitem(1,"checkpoint "..count.."/"..#artifacts,advance_playtest_checkpoint)
+ local label=finale_checkpoint and "checkpoint finale" or "checkpoint "..count.."/"..#artifacts
+ menuitem(1,label,advance_playtest_checkpoint)
 end
 
 function advance_playtest_checkpoint()
- set_playtest_checkpoint(min(#artifacts,completed_planets()+1))
+ if completed_planets()==#artifacts then
+  if not finale_checkpoint then set_playtest_finale_checkpoint() end
+ else
+  set_playtest_checkpoint(completed_planets()+1)
+ end
  refresh_playtest_menu()
 end
 

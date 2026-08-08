@@ -6,10 +6,16 @@ function init_ship()
   x=world_size/2+32,y=world_size/2+32,
   vx=0,vy=0,angle=0,thrust=0,target=nil,orbit=nil,
   sonar_period=90,sonar_bands={},sonar_next_id=1,engine_tick=0,particles={},
+  finale_particles={{},{}},
   autopilot=false,up_tap_frames=0,up_was_down=false
  }
  for i=1,48 do
   add(ship.particles,{x=cx,y=cy,life=0,maxlife=1,vx=0,vy=0,col=8})
+ end
+ for trail in all(ship.finale_particles) do
+  for i=1,24 do
+   add(trail,{x=cx,y=cy,life=0,maxlife=1,vx=0,vy=0,col=0})
+  end
  end
  reset_sonar_bands()
 end
@@ -20,22 +26,31 @@ function stop_autopilot()
 end
 
 function clear_particles()
- for p in all(ship.particles) do
-  p.x=cx
-  p.y=cy
-  p.vx=0
-  p.vy=0
-  p.life=p.maxlife
-  p.col=0
+ local pools={ship.particles,ship.finale_particles[1],ship.finale_particles[2]}
+ for pool in all(pools) do
+  for p in all(pool) do
+   p.x=cx
+   p.y=cy
+   p.vx=0
+   p.vy=0
+   p.life=p.maxlife
+   p.col=0
+  end
  end
 end
 
 function update_ship()
- if game_state==0 or game_state>=3 then
+ if game_state==0 then
   ship.angle=0.145
   update_particles(true)
   return
  end
+ if game_state==3 then
+  ship.angle=0.145
+  update_finale_particles()
+  return
+ end
+ if game_state>=4 then return end
 
  local can_fly=not pause_story
  if can_fly and btn(0) then ship.angle=(ship.angle-0.006)%1 end
@@ -99,14 +114,18 @@ function update_orbit()
 end
 
 function reset_particle(p)
- p.x=cx+sin(ship.angle)*5
- p.y=cy+cos(ship.angle)*5
  local strength=max(0.25,ship.thrust)
- if game_state==0 or game_state>=3 then strength=1 end
+ if game_state==0 then strength=1 end
+ reset_particle_at(p,cx,cy,ship.angle,strength)
+end
+
+function reset_particle_at(p,x,y,angle,strength)
+ p.x=x+sin(angle)*5
+ p.y=y+cos(angle)*5
  local speed=(0.55+rnd(0.75))*strength
  local spread=(rnd(1)-0.5)*0.35*strength
- p.vx=sin(ship.angle)*speed+cos(ship.angle)*spread
- p.vy=cos(ship.angle)*speed-sin(ship.angle)*spread
+ p.vx=sin(angle)*speed+cos(angle)*spread
+ p.vy=cos(angle)*speed-sin(angle)*spread
  p.life=0
  p.maxlife=18+flr(rnd(43))*strength
 end
@@ -121,8 +140,43 @@ function update_particles(firing)
   local q=p.life/max(1,p.maxlife)
   p.col=q<0.25 and 7 or (q<0.55 and 10 or (q<0.8 and 9 or 8))
   if p.life>=p.maxlife then
-   if firing or game_state==0 or game_state>=3 then reset_particle(p)
+   if firing or game_state==0 then reset_particle(p)
    else p.col=0 end
+  end
+ end
+end
+
+function finale_ship_position(index)
+ local offset=index==1 and 5 or -5
+ return cx+offset,cy+offset
+end
+
+function reset_finale_particles()
+ for index=1,2 do
+  local x,y=finale_ship_position(index)
+  for p in all(ship.finale_particles[index]) do
+   p.x=x
+   p.y=y
+   p.vx=0
+   p.vy=0
+   p.life=p.maxlife
+   p.col=0
+  end
+ end
+end
+
+function update_finale_particles()
+ for index=1,2 do
+  local x,y=finale_ship_position(index)
+  for p in all(ship.finale_particles[index]) do
+   p.life+=1
+   p.x+=p.vx
+   p.y+=p.vy
+   p.vx*=0.985
+   p.vy*=0.985
+   local q=p.life/max(1,p.maxlife)
+   p.col=q<0.25 and 7 or (q<0.55 and 10 or (q<0.8 and 9 or 8))
+   if p.life>=p.maxlife then reset_particle_at(p,x,y,ship.angle,1) end
   end
  end
 end
@@ -193,6 +247,14 @@ end
 function draw_particles()
  for p in all(ship.particles) do
   if p.col!=0 then pset(p.x,p.y,p.col) end
+ end
+end
+
+function draw_finale_particles()
+ for trail in all(ship.finale_particles) do
+  for p in all(trail) do
+   if p.col!=0 then pset(p.x,p.y,p.col) end
+  end
  end
 end
 

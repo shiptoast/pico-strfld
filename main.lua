@@ -40,9 +40,11 @@ function _draw()
   draw_particles()
   draw_ship(cx,cy,9,ship.angle)
  elseif game_state==3 then
-  draw_particles()
-  draw_ship(cx+5,cy+5,9,ship.angle)
-  draw_ship(cx-5,cy-5,15,ship.angle)
+  draw_finale_particles()
+  local x1,y1=finale_ship_position(1)
+  local x2,y2=finale_ship_position(2)
+  draw_ship(x1,y1,9,ship.angle)
+  draw_ship(x2,y2,15,ship.angle)
  end
 
  draw_stars(true)

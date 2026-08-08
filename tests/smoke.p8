@@ -146,8 +146,6 @@ function _init()
   end
  end
 
- advance_playtest_checkpoint()
- advance_playtest_checkpoint()
  check(completed_planets()==11,"checkpoint cap")
  check(story_state==58,"checkpoint cap story")
  check(game_state==1,"checkpoint does not skip ending")
@@ -283,6 +281,7 @@ function _init()
  check(game_state==2,"ending trigger")
  for i=1,512 do update_story() end
  check(game_state==3,"finale entry")
+ check(fade==128,"normal finale keeps fade timing")
  check(stat(49)==4,"finale cue")
  for i=1,4381 do update_story() end
  check(game_state==4,"final black")

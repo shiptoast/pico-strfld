@@ -1,13 +1,17 @@
+sonar_spawn_radius=8
+sonar_kill_radius=48
+
 function init_ship()
  ship={
   x=world_size/2+32,y=world_size/2+32,
   vx=0,vy=0,angle=0,thrust=0,target=nil,orbit=nil,
-  sonar_tick=0,sonar_period=90,engine_tick=0,particles={},
+  sonar_period=90,sonar_bands={},sonar_next_id=1,engine_tick=0,particles={},
   autopilot=false,up_tap_frames=0,up_was_down=false
  }
  for i=1,48 do
   add(ship.particles,{x=cx,y=cy,life=0,maxlife=1,vx=0,vy=0,col=8})
  end
+ reset_sonar_bands()
 end
 
 function stop_autopilot()
@@ -77,7 +81,7 @@ function update_ship()
 
  ship.x=clamp(ship.x+ship.vx,0,world_size)
  ship.y=clamp(ship.y+ship.vy,0,world_size)
- ship.sonar_tick=(ship.sonar_tick+1)%(max(20,ship.sonar_period)*2)
+ update_sonar_bands()
  update_particles(firing)
 end
 
@@ -192,16 +196,37 @@ function draw_particles()
  end
 end
 
-function sonar_front_distance(age)
- return age*18+8
+function spawn_sonar_band(lane,radius)
+ add(ship.sonar_bands,{id=ship.sonar_next_id,lane=lane,r=radius})
+ ship.sonar_next_id+=1
 end
 
-function sonar_visual_phase(tick,period)
- return tick/(max(20,period)*2)
+function reset_sonar_bands()
+ ship.sonar_bands={}
+ ship.sonar_next_id=1
+ local spacing=(sonar_kill_radius-sonar_spawn_radius)/3
+ for lane=0,2 do spawn_sonar_band(lane,sonar_spawn_radius+lane*spacing) end
 end
 
-function draw_sonar_front(ang,d,i,col)
- local stagger=(i-1)/3
+function sonar_band_step()
+ return 9/max(20,ship.sonar_period)
+end
+
+function update_sonar_bands()
+ local expired={}
+ local step=sonar_band_step()
+ for band in all(ship.sonar_bands) do
+  band.r+=step
+  if band.r>=sonar_kill_radius then add(expired,band) end
+ end
+ for band in all(expired) do
+  del(ship.sonar_bands,band)
+  spawn_sonar_band(band.lane,sonar_spawn_radius)
+ end
+end
+
+function draw_sonar_front(ang,d,lane,col)
+ local stagger=(lane-1)/3
  for j=-3,3 do
   local sweep=(j+stagger)/36
   local x=cx+cos(ang+sweep)*d
@@ -216,9 +241,7 @@ function draw_sonar()
  local dx=a.x-ship.x
  local dy=a.y-ship.y
  local ang=atan2(dx,dy)
- local phase=sonar_visual_phase(ship.sonar_tick,ship.sonar_period)
- for i=0,2 do
-  local age=(phase+i/3)%1
-  draw_sonar_front(ang,sonar_front_distance(age),i)
+ for band in all(ship.sonar_bands) do
+  draw_sonar_front(ang,band.r,band.lane)
  end
 end

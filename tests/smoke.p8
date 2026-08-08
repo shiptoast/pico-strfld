@@ -282,8 +282,13 @@ function _init()
  ship.target.x=ship.x+100
  ship.target.y=ship.y
  radio_offset=ship.target.freq
- ship.sonar_tick=90
  ship.sonar_period=90
+ ship.sonar_bands={
+  {id=1,lane=0,r=17},
+  {id=2,lane=1,r=23},
+  {id=3,lane=2,r=11}
+ }
+ ship.sonar_next_id=4
  cls()
  draw_sonar()
  local sonar_pixels=0
@@ -302,21 +307,39 @@ function _init()
  end
  check(sonar_pixels>45 and sonar_maxy-sonar_miny>24,"sonar renders broad bubble arcs")
  check(sonar_left==0,"sonar stays target-directed")
- for i=0,2 do
-  local d=sonar_front_distance((0.5+i/3)%1)
-  local sweep=(i-1)/108
+ for band in all(ship.sonar_bands) do
+  local sweep=(band.lane-1)/108
+  local d=band.r
   local front_x=cx+cos(sweep)*d
   local front_y=cy+sin(sweep)*d
   check(pixel_near(front_x,front_y,12),"sonar renders staggered successive arc fronts")
  end
- local motion_frames=9
- local reviewed_motion=motion_frames/ship.sonar_period*18
- for i=0,2 do
-  local start_age=(sonar_visual_phase(0,ship.sonar_period)+i/3)%1
-  local end_age=(sonar_visual_phase(motion_frames,ship.sonar_period)+i/3)%1
-  local motion=sonar_front_distance(end_age)-sonar_front_distance(start_age)
-  check(abs(motion-reviewed_motion/2)<0.001,"sonar front moves at half reviewed speed "..i)
+ local step=sonar_band_step()
+ check(abs(step-9/ship.sonar_period)<0.001,"sonar lifecycle keeps approved half speed")
+ ship.sonar_bands={
+  {id=101,lane=0,r=sonar_kill_radius-step/2},
+  {id=102,lane=1,r=14},
+  {id=103,lane=2,r=20}
+ }
+ ship.sonar_next_id=104
+ local survivor_r={14,20}
+ check(ship.sonar_bands[1].r+step>=sonar_kill_radius,"sonar expiring band reaches outer limit")
+ update_sonar_bands()
+ check(#ship.sonar_bands==3,"sonar lifecycle keeps three bands")
+ local expired=false
+ local replacements=0
+ for band in all(ship.sonar_bands) do
+  if band.id==101 then expired=true end
+  if band.id==104 and band.lane==0 and band.r==sonar_spawn_radius then replacements+=1 end
+  if band.id==102 then
+   check(abs(band.r-survivor_r[1]-step)<0.001,"sonar survivor advances at half speed 1")
+  end
+  if band.id==103 then
+   check(abs(band.r-survivor_r[2]-step)<0.001,"sonar survivor advances at half speed 2")
+  end
  end
+ check(not expired,"sonar expired identity disappears")
+ check(replacements==1,"sonar spawns one inner replacement")
  for first=0,1 do
   for second=first+1,2 do
    cls()
@@ -337,6 +360,11 @@ function _init()
    check(after==before,"sonar fronts avoid shared angular columns")
   end
  end
+ ship.sonar_bands={
+  {id=201,lane=0,r=17},
+  {id=202,lane=1,r=23},
+  {id=203,lane=2,r=11}
+ }
  ship.target.x=ship.x
  ship.target.y=ship.y+100
  cls()

@@ -139,22 +139,50 @@ function artifact_point(a,x,y,px,py)
  return x+rx,y+ry
 end
 
+function artifact_tower_line(a,x,y,x1,y1,x2,y2,col)
+ local ax,ay=artifact_point(a,x,y,x1,y1)
+ local bx,by=artifact_point(a,x,y,x2,y2)
+ line(ax,ay,bx,by,col)
+end
+
+function draw_artifact_tower(a,x,y,r)
+ local c=a.col
+
+ -- tapered legs and two crossed lattice bays
+ artifact_tower_line(a,x,y,-r/2,-r,0,-3*r,c)
+ artifact_tower_line(a,x,y,r/2,-r,0,-3*r,c)
+ artifact_tower_line(a,x,y,-r/2,-r,r/2,-r,c)
+ artifact_tower_line(a,x,y,-3*r/8,-3*r/2,3*r/8,-3*r/2,c)
+ artifact_tower_line(a,x,y,-r/4,-2*r, r/4,-2*r,c)
+ artifact_tower_line(a,x,y,-r/8,-5*r/2,r/8,-5*r/2,c)
+ artifact_tower_line(a,x,y,-r/2,-r,3*r/8,-3*r/2,c)
+ artifact_tower_line(a,x,y,r/2,-r,-3*r/8,-3*r/2,c)
+ artifact_tower_line(a,x,y,-3*r/8,-3*r/2,r/4,-2*r,c)
+ artifact_tower_line(a,x,y,3*r/8,-3*r/2,-r/4,-2*r,c)
+ artifact_tower_line(a,x,y,-r/4,-2*r,r/8,-5*r/2,c)
+ artifact_tower_line(a,x,y,r/4,-2*r,-r/8,-5*r/2,c)
+
+ -- small surface equipment hut from the original tower
+ local house=a.off and 5 or 6
+ artifact_tower_line(a,x,y,-7*r/8,-r,-r/4,-r,house)
+ artifact_tower_line(a,x,y,-7*r/8,-r,-7*r/8,-5*r/4,house)
+ artifact_tower_line(a,x,y,-7*r/8,-5*r/4,-r/4,-5*r/4,house)
+ artifact_tower_line(a,x,y,-r/4,-5*r/4,-r/4,-r,house)
+ artifact_tower_line(a,x,y,-r,-5*r/4,-9*r/16,-3*r/2,c)
+ artifact_tower_line(a,x,y,-9*r/16,-3*r/2,-r/8,-5*r/4,c)
+ local wx,wy=artifact_point(a,x,y,-9*r/16,-9*r/8)
+ pset(wx,wy,0)
+
+ local tx,ty=artifact_point(a,x,y,0,-3*r)
+ circfill(tx,ty,1,a.off and 5 or 10)
+end
+
 function draw_artifact(a,x,y)
  local r=max(8,min(22,a.size/2))
  circfill(x,y,r,0)
  circfill(x,y,r-1,a.col)
  circfill(x,y,max(2,r-5),a.off and 1 or 7)
- local blx,bly=artifact_point(a,x,y,-r/2,-r)
- local brx,bry=artifact_point(a,x,y,r/2,-r)
- local lx,ly=artifact_point(a,x,y,-2*r,-2*r)
- local rx,ry=artifact_point(a,x,y,2*r,-2*r)
- local tx,ty=artifact_point(a,x,y,0,-3*r)
- line(blx,bly,lx,ly,a.col)
- line(brx,bry,rx,ry,a.col)
- line(lx,ly,rx,ry,a.col)
- line(lx,ly,tx,ty,a.col)
- line(rx,ry,tx,ty,a.col)
- circfill(tx,ty,1,a.off and 5 or 10)
+ draw_artifact_tower(a,x,y,r)
 end
 
 function draw_minimap()

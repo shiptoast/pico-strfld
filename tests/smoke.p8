@@ -361,6 +361,39 @@ function _init()
  local ax1,ay1=artifact_point(a,cx,cy,0,-10)
  check(abs(ax0-ax1)>5 and abs(ay0-ay1)>5,"artifact rotation")
 
+ a.rot=0
+ a.col=12
+ a.off=false
+ cls()
+ draw_artifact_tower(a,cx,cy,16)
+ local lower_cross=0
+ local upper_cross=0
+ local stray_width=0
+ local hut_pixels=0
+ for py=cy-33,cy-23 do
+  for px=cx-3,cx+3 do
+   if pget(px,py)==12 then lower_cross+=1 end
+  end
+ end
+ for py=cy-42,cy-34 do
+  for px=cx-3,cx+3 do
+   if pget(px,py)==12 then upper_cross+=1 end
+  end
+ end
+ for py=cy-47,cy-26 do
+  for px=cx-24,cx+24 do
+   if abs(px-cx)>12 and pget(px,py)==12 then stray_width+=1 end
+  end
+ end
+ for py=cy-22,cy-14 do
+  for px=cx-16,cx-3 do
+   if pget(px,py)!=0 then hut_pixels+=1 end
+  end
+ end
+ check(lower_cross>0 and upper_cross>0,"artifact crossed lattice renders")
+ check(stray_width==0,"artifact tower keeps tapered silhouette")
+ check(hut_pixels>8,"artifact surface hut renders")
+
  printh("starfield smoke: passed")
  extcmd("shutdown")
 end

@@ -45,6 +45,10 @@ artifact discovery instead.
 The mapping consumes PICO-8's six buttons while retaining the six independent
 actions from the keyboard original.
 
+The title and two-ship finale use a fixed visual flight vector for star
+parallax. Normal play continues to move the layered field from the ship's real
+velocity, so the cinematic fly-by does not alter flight state.
+
 ## Running and exporting
 
 PICO-8 is commercial software and is not included. Install a licensed copy and

@@ -1,5 +1,6 @@
 star_large_chance=0.2
 star_color_chance=0.05
+flyby_speed=0.35
 
 function init_world()
  finale_checkpoint=false
@@ -109,10 +110,18 @@ function advance_playtest_checkpoint()
  refresh_playtest_menu()
 end
 
+function starfield_motion()
+ if game_state==0 or game_state==3 then
+  return -sin(ship.angle)*flyby_speed,-cos(ship.angle)*flyby_speed
+ end
+ return ship.vx,ship.vy
+end
+
 function update_world()
+ local vx,vy=starfield_motion()
  for s in all(stars) do
-  s.x-=ship.vx*s.z
-  s.y-=ship.vy*s.z
+  s.x-=vx*s.z
+  s.y-=vy*s.z
   if s.x<0 then s.x+=sw end
   if s.x>=sw then s.x-=sw end
   if s.y<0 then s.y+=112 end

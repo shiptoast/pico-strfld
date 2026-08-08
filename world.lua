@@ -190,15 +190,20 @@ function draw_artifact_tower(a,x,y,r)
  -- solid shaded surface hut from the original tower
  local house=a.off and 5 or 6
  local roof=a.off and 1 or 5
- local pivot_x=-7*r/16
- local pivot_y=-3*r/4+inward
- artifact_hut_fill(a,x,y,-3*r/4,-r+inward,-r/8,-3*r/4+inward,pivot_x,pivot_y,house)
+ local base_pivot_x=-7*r/16
+ local base_pivot_y=-3*r/4+inward
+ local pivot_d=sqrt(base_pivot_x*base_pivot_x+base_pivot_y*base_pivot_y)
+ local hut_dx=base_pivot_x/pivot_d
+ local hut_dy=base_pivot_y/pivot_d
+ local pivot_x=base_pivot_x+hut_dx
+ local pivot_y=base_pivot_y+hut_dy
+ artifact_hut_fill(a,x,y,-3*r/4+hut_dx,-r+inward+hut_dy,-r/8+hut_dx,-3*r/4+inward+hut_dy,pivot_x,pivot_y,house)
  for py=-5*r/4+inward,-r+inward do
   local spread=(py+5*r/4-inward)*7/4
-  artifact_hut_line(a,x,y,-7*r/16-spread,py,-7*r/16+spread,py,pivot_x,pivot_y,roof)
+  artifact_hut_line(a,x,y,-7*r/16-spread+hut_dx,py+hut_dy,-7*r/16+spread+hut_dx,py+hut_dy,pivot_x,pivot_y,roof)
  end
- artifact_hut_fill(a,x,y,-5*r/8,-15*r/16+inward,-r/2,-7*r/8+inward,pivot_x,pivot_y,0)
- artifact_hut_fill(a,x,y,-5*r/16,-15*r/16+inward,-3*r/16,-3*r/4+inward,pivot_x,pivot_y,c)
+ artifact_hut_fill(a,x,y,-5*r/8+hut_dx,-15*r/16+inward+hut_dy,-r/2+hut_dx,-7*r/8+inward+hut_dy,pivot_x,pivot_y,0)
+ artifact_hut_fill(a,x,y,-5*r/16+hut_dx,-15*r/16+inward+hut_dy,-3*r/16+hut_dx,-3*r/4+inward+hut_dy,pivot_x,pivot_y,c)
 
  local tx,ty=artifact_point(a,x,y,0,-3*r+inward)
  circfill(tx,ty,2,a.off and 5 or 10)

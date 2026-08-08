@@ -24,10 +24,17 @@ function pixel_near(x,y,col)
 end
 
 function check_hut_radial(a,x,y,label)
- local pivot_x,pivot_y=artifact_point(a,x,y,-7,-9)
- local apex_x,apex_y=artifact_hut_point(a,x,y,-7,-17,-7,-9)
- local left_x,left_y=artifact_hut_point(a,x,y,-12,-9,-7,-9)
- local right_x,right_y=artifact_hut_point(a,x,y,-2,-9,-7,-9)
+ local base_x,base_y=-7,-9
+ local d=sqrt(base_x*base_x+base_y*base_y)
+ local dx,dy=base_x/d,base_y/d
+ local hut_pivot_x,hut_pivot_y=base_x+dx,base_y+dy
+ local pivot_x,pivot_y=artifact_point(a,x,y,hut_pivot_x,hut_pivot_y)
+ local old_pivot_x,old_pivot_y=artifact_point(a,x,y,base_x,base_y)
+ local apex_x,apex_y=artifact_hut_point(a,x,y,-7+dx,-17+dy,hut_pivot_x,hut_pivot_y)
+ local mark_x,mark_y=artifact_hut_point(a,x,y,-6.5+dx,-16+dy,hut_pivot_x,hut_pivot_y)
+ local old_mark_x,old_mark_y=artifact_hut_point(a,x,y,-6.5,-16,base_x,base_y)
+ local left_x,left_y=artifact_hut_point(a,x,y,-12+dx,-9+dy,hut_pivot_x,hut_pivot_y)
+ local right_x,right_y=artifact_hut_point(a,x,y,-2+dx,-9+dy,hut_pivot_x,hut_pivot_y)
  local radial_x=pivot_x-x
  local radial_y=pivot_y-y
  local axis_x=apex_x-pivot_x
@@ -38,6 +45,10 @@ function check_hut_radial(a,x,y,label)
  check(abs(edge_x*radial_x+edge_y*radial_y)<0.1,"artifact hut edge is tangent "..label)
  check(pixel_near(apex_x,apex_y,5),"artifact hut roof renders radially "..label)
  check(pixel_near(left_x,left_y,6) and pixel_near(right_x,right_y,6),"artifact hut seated edge renders "..label)
+ check(pget(mark_x,mark_y)==5 and pget(old_mark_x,old_mark_y)!=5,"artifact hut moves one pixel outward "..label)
+ local pivot_r=sqrt((pivot_x-x)*(pivot_x-x)+(pivot_y-y)*(pivot_y-y))
+ local old_pivot_r=sqrt((old_pivot_x-x)*(old_pivot_x-x)+(old_pivot_y-y)*(old_pivot_y-y))
+ check(abs(pivot_r-old_pivot_r-1)<0.01,"artifact hut pivot moves one pixel outward "..label)
  local contact=0
  for i=0,4 do
   local scale=1-i/8
@@ -437,8 +448,11 @@ function _init()
 
  local new_beacon_x,new_beacon_y=artifact_point(a,cx,cy,0,-45)
  local old_beacon_x,old_beacon_y=artifact_point(a,cx,cy,0,-48)
- local new_hut_x,new_hut_y=artifact_hut_point(a,cx,cy,-7,-11,-7,-9)
- local old_hut_x,old_hut_y=artifact_hut_point(a,cx,cy,-7,-14,-7,-9)
+ local hut_d=sqrt(130)
+ local hut_dx,hut_dy=-7/hut_d,-9/hut_d
+ local hut_pivot_x,hut_pivot_y=-7+hut_dx,-9+hut_dy
+ local new_hut_x,new_hut_y=artifact_hut_point(a,cx,cy,-7+hut_dx,-11+hut_dy,hut_pivot_x,hut_pivot_y)
+ local old_hut_x,old_hut_y=artifact_hut_point(a,cx,cy,-7+hut_dx,-14+hut_dy,hut_pivot_x,hut_pivot_y)
  check(pget(new_beacon_x,new_beacon_y)==10 and pget(old_beacon_x,old_beacon_y)!=10,"artifact beacon moves inward upright")
  check(pixel_near(new_hut_x,new_hut_y,6) and pget(old_hut_x,old_hut_y)!=6,"artifact hut moves inward upright")
  check_hut_radial(a,cx,cy,"upright")
@@ -448,8 +462,8 @@ function _init()
  draw_artifact(a,cx,cy)
  new_beacon_x,new_beacon_y=artifact_point(a,cx,cy,0,-45)
  old_beacon_x,old_beacon_y=artifact_point(a,cx,cy,0,-48)
- new_hut_x,new_hut_y=artifact_hut_point(a,cx,cy,-7,-11,-7,-9)
- old_hut_x,old_hut_y=artifact_hut_point(a,cx,cy,-7,-14,-7,-9)
+ new_hut_x,new_hut_y=artifact_hut_point(a,cx,cy,-7+hut_dx,-11+hut_dy,hut_pivot_x,hut_pivot_y)
+ old_hut_x,old_hut_y=artifact_hut_point(a,cx,cy,-7+hut_dx,-14+hut_dy,hut_pivot_x,hut_pivot_y)
  check(pget(new_beacon_x,new_beacon_y)==10 and pget(old_beacon_x,old_beacon_y)!=10,"artifact beacon moves inward rotated")
  check(pixel_near(new_hut_x,new_hut_y,6) and pget(old_hut_x,old_hut_y)!=6,"artifact hut moves inward rotated")
  check_hut_radial(a,cx,cy,"rotated")

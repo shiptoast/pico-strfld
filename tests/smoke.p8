@@ -282,7 +282,7 @@ function _init()
  ship.target.x=ship.x+100
  ship.target.y=ship.y
  radio_offset=ship.target.freq
- ship.sonar_tick=45
+ ship.sonar_tick=90
  ship.sonar_period=90
  cls()
  draw_sonar()
@@ -309,7 +309,14 @@ function _init()
   local front_y=cy+sin(sweep)*d
   check(pixel_near(front_x,front_y,12),"sonar renders staggered successive arc fronts")
  end
- check(sonar_front_distance(0.6)-sonar_front_distance(0.5)<2,"sonar fronts travel slowly")
+ local motion_frames=9
+ local reviewed_motion=motion_frames/ship.sonar_period*18
+ for i=0,2 do
+  local start_age=(sonar_visual_phase(0,ship.sonar_period)+i/3)%1
+  local end_age=(sonar_visual_phase(motion_frames,ship.sonar_period)+i/3)%1
+  local motion=sonar_front_distance(end_age)-sonar_front_distance(start_age)
+  check(abs(motion-reviewed_motion/2)<0.001,"sonar front moves at half reviewed speed "..i)
+ end
  for first=0,1 do
   for second=first+1,2 do
    cls()

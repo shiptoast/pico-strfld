@@ -77,7 +77,7 @@ function update_ship()
 
  ship.x=clamp(ship.x+ship.vx,0,world_size)
  ship.y=clamp(ship.y+ship.vy,0,world_size)
- ship.sonar_tick=(ship.sonar_tick+1)%max(20,ship.sonar_period)
+ ship.sonar_tick=(ship.sonar_tick+1)%(max(20,ship.sonar_period)*2)
  update_particles(firing)
 end
 
@@ -196,6 +196,10 @@ function sonar_front_distance(age)
  return age*18+8
 end
 
+function sonar_visual_phase(tick,period)
+ return tick/(max(20,period)*2)
+end
+
 function draw_sonar_front(ang,d,i,col)
  local stagger=(i-1)/3
  for j=-3,3 do
@@ -212,7 +216,7 @@ function draw_sonar()
  local dx=a.x-ship.x
  local dy=a.y-ship.y
  local ang=atan2(dx,dy)
- local phase=ship.sonar_tick/max(1,ship.sonar_period)
+ local phase=sonar_visual_phase(ship.sonar_tick,ship.sonar_period)
  for i=0,2 do
   local age=(phase+i/3)%1
   draw_sonar_front(ang,sonar_front_distance(age),i)

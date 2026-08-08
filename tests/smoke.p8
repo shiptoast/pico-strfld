@@ -276,6 +276,30 @@ function _init()
  cls()
  draw_ship(cx,cy,9,0.145)
 
+ ship.x=world_size/2
+ ship.y=world_size/2
+ for a in all(artifacts) do a.visible=false end
+ local marker_x=5+ship.x/world_size*22
+ local marker_y=5+ship.y/world_size*22
+ cls()
+ draw_minimap(0)
+ local marker_pixels=0
+ for py=marker_y-1,marker_y+1 do
+  for px=marker_x-1,marker_x+1 do
+   if pget(px,py)==9 then marker_pixels+=1 end
+  end
+ end
+ check(pget(marker_x,marker_y)==9 and marker_pixels==1,"minimap ship marker is one body-color pixel")
+ cls()
+ draw_minimap(0.5)
+ marker_pixels=0
+ for py=marker_y-1,marker_y+1 do
+  for px=marker_x-1,marker_x+1 do
+   if pget(px,py)==9 then marker_pixels+=1 end
+  end
+ end
+ check(marker_pixels==0,"minimap ship marker keeps off blink phase")
+
  game_state=1
  pause_story=false
  ship.orbit=nil

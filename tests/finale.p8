@@ -61,12 +61,39 @@ function _init()
  init_world()
  init_radio()
 
+ check(#stars==150 and star_color_chance==0.05 and star_large_chance==0.2,"star field configuration")
+ local colored_stars,large_stars=0,0
+ for s in all(stars) do
+  if s.col!=6 then colored_stars+=1 end
+  if s.size==2 then large_stars+=1 end
+ end
+ check(colored_stars==11 and large_stars==27,"fixed-seed star rarity")
+
  update_ship()
  check_scene_star_motion("intro star flyby")
  check(ship.vx==0 and ship.vy==0,"intro flyby is visual only")
- game_state=1
+ local title_vx,title_vy=starfield_motion()
+ start_flight()
+ local coast_vx,coast_vy=starfield_motion()
+ check(abs(coast_vx-title_vx)<0.001 and abs(coast_vy-title_vy)<0.001,"first flight frame continuity")
+ check(ship.vx==0 and ship.vy==0,"coast does not seed ship velocity")
+ local initial_coast=dist2(0,0,star_coast_vx,star_coast_vy)
+ update_world()
+ local first_coast=dist2(0,0,star_coast_vx,star_coast_vy)
+ check(abs(first_coast-initial_coast*0.995)<0.001,"coast passive damping")
+ for i=1,119 do update_world() end
+ local late_coast=dist2(0,0,star_coast_vx,star_coast_vy)
+ check(late_coast<first_coast and abs(late_coast-initial_coast*0.995^120)<0.01,"coast monotonic decay")
+ for i=1,800 do update_world() end
+ check(not star_coast_active and star_coast_vx==0 and star_coast_vy==0,"coast visually stops")
+ check(ship.vx==0 and ship.vy==0,"coast keeps ship stationary")
+
+ game_state=0
+ start_flight()
  ship.vx=0.2
  ship.vy=-0.1
+ coast_vx,coast_vy=starfield_motion()
+ check(coast_vx==ship.vx and coast_vy==ship.vy and not star_coast_active,"gameplay velocity takes control")
  local flight_star=stars[1]
  flight_star.x=40
  flight_star.y=40

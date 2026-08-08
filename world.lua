@@ -4,6 +4,7 @@ flyby_speed=0.35
 
 function init_world()
  finale_checkpoint=false
+ clear_starfield_coast()
  stars={}
  for i=1,150 do
   add(stars,{
@@ -62,6 +63,7 @@ function set_playtest_checkpoint(count)
  ship.vx=0
  ship.vy=0
  ship.thrust=0
+ clear_starfield_coast()
  clear_particles()
  stop_autopilot()
  ship.up_was_down=false
@@ -114,7 +116,33 @@ function starfield_motion()
  if game_state==0 or game_state==3 then
   return -sin(ship.angle)*flyby_speed,-cos(ship.angle)*flyby_speed
  end
+ if game_state==1 and star_coast_active then
+  if ship.vx!=0 or ship.vy!=0 then
+   clear_starfield_coast()
+  else
+   return star_coast_vx,star_coast_vy
+  end
+ end
  return ship.vx,ship.vy
+end
+
+function begin_starfield_coast()
+ star_coast_vx=-sin(ship.angle)*flyby_speed
+ star_coast_vy=-cos(ship.angle)*flyby_speed
+ star_coast_active=true
+end
+
+function clear_starfield_coast()
+ star_coast_vx=0
+ star_coast_vy=0
+ star_coast_active=false
+end
+
+function damp_starfield_coast()
+ if not star_coast_active then return end
+ star_coast_vx*=0.995
+ star_coast_vy*=0.995
+ if dist2(0,0,star_coast_vx,star_coast_vy)<0.01 then clear_starfield_coast() end
 end
 
 function update_world()
@@ -127,6 +155,7 @@ function update_world()
   if s.y<0 then s.y+=112 end
   if s.y>=112 then s.y-=112 end
  end
+ if game_state==1 then damp_starfield_coast() end
 
  for a in all(artifacts) do
   a.rot=(a.rot+0.001*a.dir)%1

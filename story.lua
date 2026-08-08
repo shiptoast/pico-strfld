@@ -30,6 +30,7 @@ end
 
 function start_flight()
  clear_particles()
+ begin_starfield_coast()
  game_state=1
  set_story(0)
 end

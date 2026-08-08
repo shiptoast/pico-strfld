@@ -46,8 +46,9 @@ The mapping consumes PICO-8's six buttons while retaining the six independent
 actions from the keyboard original.
 
 The title and two-ship finale use a fixed visual flight vector for star
-parallax. Normal play continues to move the layered field from the ship's real
-velocity, so the cinematic fly-by does not alter flight state.
+parallax. Starting the game carries that vector into a visual-only coast which
+damps like released thrust until space stops; actual flight velocity takes over
+immediately on movement. The cinematic fly-by never alters ship state.
 
 ## Running and exporting
 

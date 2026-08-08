@@ -1,10 +1,13 @@
+star_large_chance=0.2
+star_color_chance=0.05
+
 function init_world()
  stars={}
  for i=1,150 do
   add(stars,{
    x=rnd(sw),y=rnd(112),z=0.35+rnd(1.4),
-   size=flr(rnd(2))+1,
-   col=rnd(1)<0.15 and (8+flr(rnd(7))) or 6
+   size=rnd(1)<star_large_chance and 2 or 1,
+   col=rnd(1)<star_color_chance and (8+flr(rnd(7))) or 6
   })
  end
 

@@ -364,12 +364,14 @@ function _init()
  a.rot=0
  a.col=12
  a.off=false
+ a.size=32
  cls()
- draw_artifact_tower(a,cx,cy,16)
+ draw_artifact(a,cx,cy)
  local lower_cross=0
  local upper_cross=0
  local stray_width=0
  local hut_pixels=0
+ local beacon_pixels=0
  for py=cy-33,cy-23 do
   for px=cx-3,cx+3 do
    if pget(px,py)==12 then lower_cross+=1 end
@@ -385,14 +387,37 @@ function _init()
    if abs(px-cx)>12 and pget(px,py)==12 then stray_width+=1 end
   end
  end
- for py=cy-22,cy-14 do
-  for px=cx-16,cx-3 do
-   if pget(px,py)!=0 then hut_pixels+=1 end
+ for py=cy-20,cy-12 do
+  for px=cx-14,cx do
+   if pget(px,py)==6 or pget(px,py)==5 then hut_pixels+=1 end
+  end
+ end
+ for py=cy-50,cy-46 do
+  for px=cx-2,cx+2 do
+   if pget(px,py)==10 then beacon_pixels+=1 end
   end
  end
  check(lower_cross>0 and upper_cross>0,"artifact crossed lattice renders")
  check(stray_width==0,"artifact tower keeps tapered silhouette")
- check(hut_pixels>8,"artifact surface hut renders")
+ check(hut_pixels>30,"artifact surface hut is solid")
+ check(beacon_pixels>=13,"artifact beacon is materially enlarged")
+
+ local upright_join=0
+ for py=-12,-8 do
+  local jx,jy=artifact_point(a,cx,cy,-4,py)
+  if pget(jx,jy)!=0 then upright_join+=1 end
+ end
+ check(upright_join==5,"artifact hut joins upright planet")
+
+ a.rot=0.125
+ cls()
+ draw_artifact(a,cx,cy)
+ local rotated_join=0
+ for py=-12,-8 do
+  local jx,jy=artifact_point(a,cx,cy,-4,py)
+  if pget(jx,jy)!=0 then rotated_join+=1 end
+ end
+ check(rotated_join==5,"artifact hut joins rotated planet")
 
  printh("starfield smoke: passed")
  extcmd("shutdown")

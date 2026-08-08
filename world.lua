@@ -145,6 +145,13 @@ function artifact_tower_line(a,x,y,x1,y1,x2,y2,col)
  line(ax,ay,bx,by,col)
 end
 
+function artifact_tower_fill(a,x,y,x1,y1,x2,y2,col)
+ for py=y1,y2 do
+  artifact_tower_line(a,x,y,x1,py,x2,py,col)
+  if py<y2 then artifact_tower_line(a,x,y,x1,py+0.5,x2,py+0.5,col) end
+ end
+end
+
 function draw_artifact_tower(a,x,y,r)
  local c=a.col
 
@@ -162,19 +169,19 @@ function draw_artifact_tower(a,x,y,r)
  artifact_tower_line(a,x,y,-r/4,-2*r,r/8,-5*r/2,c)
  artifact_tower_line(a,x,y,r/4,-2*r,-r/8,-5*r/2,c)
 
- -- small surface equipment hut from the original tower
+ -- solid shaded surface hut from the original tower
  local house=a.off and 5 or 6
- artifact_tower_line(a,x,y,-7*r/8,-r,-r/4,-r,house)
- artifact_tower_line(a,x,y,-7*r/8,-r,-7*r/8,-5*r/4,house)
- artifact_tower_line(a,x,y,-7*r/8,-5*r/4,-r/4,-5*r/4,house)
- artifact_tower_line(a,x,y,-r/4,-5*r/4,-r/4,-r,house)
- artifact_tower_line(a,x,y,-r,-5*r/4,-9*r/16,-3*r/2,c)
- artifact_tower_line(a,x,y,-9*r/16,-3*r/2,-r/8,-5*r/4,c)
- local wx,wy=artifact_point(a,x,y,-9*r/16,-9*r/8)
- pset(wx,wy,0)
+ local roof=a.off and 1 or 5
+ artifact_tower_fill(a,x,y,-3*r/4,-r,-r/8,-3*r/4,house)
+ for py=-5*r/4,-r do
+  local spread=(py+5*r/4)*7/4
+  artifact_tower_line(a,x,y,-7*r/16-spread,py,-7*r/16+spread,py,roof)
+ end
+ artifact_tower_fill(a,x,y,-5*r/8,-15*r/16,-r/2,-7*r/8,0)
+ artifact_tower_fill(a,x,y,-5*r/16,-15*r/16,-3*r/16,-3*r/4,c)
 
  local tx,ty=artifact_point(a,x,y,0,-3*r)
- circfill(tx,ty,1,a.off and 5 or 10)
+ circfill(tx,ty,2,a.off and 5 or 10)
 end
 
 function draw_artifact(a,x,y)

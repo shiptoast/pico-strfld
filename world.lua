@@ -145,10 +145,27 @@ function artifact_tower_line(a,x,y,x1,y1,x2,y2,col)
  line(ax,ay,bx,by,col)
 end
 
-function artifact_tower_fill(a,x,y,x1,y1,x2,y2,col)
+function artifact_hut_point(a,x,y,px,py,pivot_x,pivot_y)
+ local d=sqrt(pivot_x*pivot_x+pivot_y*pivot_y)
+ local ca=-pivot_y/d
+ local sa=-pivot_x/d
+ local dx=px-pivot_x
+ local dy=py-pivot_y
+ local hx=pivot_x+dx*ca+dy*sa
+ local hy=pivot_y-dx*sa+dy*ca
+ return artifact_point(a,x,y,hx,hy)
+end
+
+function artifact_hut_line(a,x,y,x1,y1,x2,y2,pivot_x,pivot_y,col)
+ local ax,ay=artifact_hut_point(a,x,y,x1,y1,pivot_x,pivot_y)
+ local bx,by=artifact_hut_point(a,x,y,x2,y2,pivot_x,pivot_y)
+ line(ax,ay,bx,by,col)
+end
+
+function artifact_hut_fill(a,x,y,x1,y1,x2,y2,pivot_x,pivot_y,col)
  for py=y1,y2 do
-  artifact_tower_line(a,x,y,x1,py,x2,py,col)
-  if py<y2 then artifact_tower_line(a,x,y,x1,py+0.5,x2,py+0.5,col) end
+  artifact_hut_line(a,x,y,x1,py,x2,py,pivot_x,pivot_y,col)
+  if py<y2 then artifact_hut_line(a,x,y,x1,py+0.5,x2,py+0.5,pivot_x,pivot_y,col) end
  end
 end
 
@@ -173,13 +190,15 @@ function draw_artifact_tower(a,x,y,r)
  -- solid shaded surface hut from the original tower
  local house=a.off and 5 or 6
  local roof=a.off and 1 or 5
- artifact_tower_fill(a,x,y,-3*r/4,-r+inward,-r/8,-3*r/4+inward,house)
+ local pivot_x=-7*r/16
+ local pivot_y=-3*r/4+inward
+ artifact_hut_fill(a,x,y,-3*r/4,-r+inward,-r/8,-3*r/4+inward,pivot_x,pivot_y,house)
  for py=-5*r/4+inward,-r+inward do
   local spread=(py+5*r/4-inward)*7/4
-  artifact_tower_line(a,x,y,-7*r/16-spread,py,-7*r/16+spread,py,roof)
+  artifact_hut_line(a,x,y,-7*r/16-spread,py,-7*r/16+spread,py,pivot_x,pivot_y,roof)
  end
- artifact_tower_fill(a,x,y,-5*r/8,-15*r/16+inward,-r/2,-7*r/8+inward,0)
- artifact_tower_fill(a,x,y,-5*r/16,-15*r/16+inward,-3*r/16,-3*r/4+inward,c)
+ artifact_hut_fill(a,x,y,-5*r/8,-15*r/16+inward,-r/2,-7*r/8+inward,pivot_x,pivot_y,0)
+ artifact_hut_fill(a,x,y,-5*r/16,-15*r/16+inward,-3*r/16,-3*r/4+inward,pivot_x,pivot_y,c)
 
  local tx,ty=artifact_point(a,x,y,0,-3*r+inward)
  circfill(tx,ty,2,a.off and 5 or 10)

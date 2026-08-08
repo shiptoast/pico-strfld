@@ -23,6 +23,30 @@ function pixel_near(x,y,col)
  return false
 end
 
+function check_hut_radial(a,x,y,label)
+ local pivot_x,pivot_y=artifact_point(a,x,y,-7,-9)
+ local apex_x,apex_y=artifact_hut_point(a,x,y,-7,-17,-7,-9)
+ local left_x,left_y=artifact_hut_point(a,x,y,-12,-9,-7,-9)
+ local right_x,right_y=artifact_hut_point(a,x,y,-2,-9,-7,-9)
+ local radial_x=pivot_x-x
+ local radial_y=pivot_y-y
+ local axis_x=apex_x-pivot_x
+ local axis_y=apex_y-pivot_y
+ local edge_x=right_x-left_x
+ local edge_y=right_y-left_y
+ check(abs(axis_x*radial_y-axis_y*radial_x)<0.1 and axis_x*radial_x+axis_y*radial_y>0,"artifact hut follows radius "..label)
+ check(abs(edge_x*radial_x+edge_y*radial_y)<0.1,"artifact hut edge is tangent "..label)
+ check(pixel_near(apex_x,apex_y,5),"artifact hut roof renders radially "..label)
+ check(pixel_near(left_x,left_y,6) and pixel_near(right_x,right_y,6),"artifact hut seated edge renders "..label)
+ local contact=0
+ for i=0,4 do
+  local scale=1-i/8
+  local jx,jy=artifact_point(a,x,y,-7*scale,-9*scale)
+  if pget(jx,jy)!=0 then contact+=1 end
+ end
+ check(contact==5,"artifact hut keeps surface contact "..label)
+end
+
 function visible_particle_count()
  local count=0
  for p in all(ship.particles) do
@@ -396,8 +420,8 @@ function _init()
    if abs(px-cx)>12 and pget(px,py)==12 then stray_width+=1 end
   end
  end
- for py=cy-17,cy-9 do
-  for px=cx-14,cx do
+ for py=cy-19,cy-4 do
+  for px=cx-17,cx+2 do
    if pget(px,py)==6 or pget(px,py)==5 then hut_pixels+=1 end
   end
  end
@@ -413,33 +437,22 @@ function _init()
 
  local new_beacon_x,new_beacon_y=artifact_point(a,cx,cy,0,-45)
  local old_beacon_x,old_beacon_y=artifact_point(a,cx,cy,0,-48)
- local new_hut_x,new_hut_y=artifact_point(a,cx,cy,-10,-10)
- local old_hut_x,old_hut_y=artifact_point(a,cx,cy,-10,-16)
+ local new_hut_x,new_hut_y=artifact_hut_point(a,cx,cy,-7,-11,-7,-9)
+ local old_hut_x,old_hut_y=artifact_hut_point(a,cx,cy,-7,-14,-7,-9)
  check(pget(new_beacon_x,new_beacon_y)==10 and pget(old_beacon_x,old_beacon_y)!=10,"artifact beacon moves inward upright")
- check(pget(new_hut_x,new_hut_y)==6 and pget(old_hut_x,old_hut_y)!=6,"artifact hut moves inward upright")
-
- local upright_join=0
- for py=-9,-5 do
-  local jx,jy=artifact_point(a,cx,cy,-4,py)
-  if pget(jx,jy)!=0 then upright_join+=1 end
- end
- check(upright_join==5,"artifact hut joins upright planet")
+ check(pixel_near(new_hut_x,new_hut_y,6) and pget(old_hut_x,old_hut_y)!=6,"artifact hut moves inward upright")
+ check_hut_radial(a,cx,cy,"upright")
 
  a.rot=0.125
  cls()
  draw_artifact(a,cx,cy)
  new_beacon_x,new_beacon_y=artifact_point(a,cx,cy,0,-45)
  old_beacon_x,old_beacon_y=artifact_point(a,cx,cy,0,-48)
- new_hut_x,new_hut_y=artifact_point(a,cx,cy,-10,-10)
- old_hut_x,old_hut_y=artifact_point(a,cx,cy,-10,-16)
+ new_hut_x,new_hut_y=artifact_hut_point(a,cx,cy,-7,-11,-7,-9)
+ old_hut_x,old_hut_y=artifact_hut_point(a,cx,cy,-7,-14,-7,-9)
  check(pget(new_beacon_x,new_beacon_y)==10 and pget(old_beacon_x,old_beacon_y)!=10,"artifact beacon moves inward rotated")
  check(pixel_near(new_hut_x,new_hut_y,6) and pget(old_hut_x,old_hut_y)!=6,"artifact hut moves inward rotated")
- local rotated_join=0
- for py=-9,-5 do
-  local jx,jy=artifact_point(a,cx,cy,-4,py)
-  if pget(jx,jy)!=0 then rotated_join+=1 end
- end
- check(rotated_join==5,"artifact hut joins rotated planet")
+ check_hut_radial(a,cx,cy,"rotated")
 
  printh("starfield smoke: passed")
  extcmd("shutdown")

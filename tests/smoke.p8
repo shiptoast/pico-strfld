@@ -14,6 +14,50 @@ function check(ok,label)
  end
 end
 
+function pixel_near(x,y,col)
+ for py=y-1,y+1 do
+  for px=x-1,x+1 do
+   if pget(px,py)==col then return true end
+  end
+ end
+ return false
+end
+
+function check_hut_radial(a,x,y,label)
+ local base_x,base_y=-7,-9
+ local d=sqrt(base_x*base_x+base_y*base_y)
+ local dx,dy=base_x/d,base_y/d
+ local hut_pivot_x,hut_pivot_y=base_x+dx,base_y+dy
+ local pivot_x,pivot_y=artifact_point(a,x,y,hut_pivot_x,hut_pivot_y)
+ local old_pivot_x,old_pivot_y=artifact_point(a,x,y,base_x,base_y)
+ local apex_x,apex_y=artifact_hut_point(a,x,y,-7+dx,-17+dy,hut_pivot_x,hut_pivot_y)
+ local mark_x,mark_y=artifact_hut_point(a,x,y,-6.5+dx,-16+dy,hut_pivot_x,hut_pivot_y)
+ local old_mark_x,old_mark_y=artifact_hut_point(a,x,y,-6.5,-16,base_x,base_y)
+ local left_x,left_y=artifact_hut_point(a,x,y,-12+dx,-9+dy,hut_pivot_x,hut_pivot_y)
+ local right_x,right_y=artifact_hut_point(a,x,y,-2+dx,-9+dy,hut_pivot_x,hut_pivot_y)
+ local radial_x=pivot_x-x
+ local radial_y=pivot_y-y
+ local axis_x=apex_x-pivot_x
+ local axis_y=apex_y-pivot_y
+ local edge_x=right_x-left_x
+ local edge_y=right_y-left_y
+ check(abs(axis_x*radial_y-axis_y*radial_x)<0.1 and axis_x*radial_x+axis_y*radial_y>0,"artifact hut follows radius "..label)
+ check(abs(edge_x*radial_x+edge_y*radial_y)<0.1,"artifact hut edge is tangent "..label)
+ check(pixel_near(apex_x,apex_y,5),"artifact hut roof renders radially "..label)
+ check(pixel_near(left_x,left_y,6) and pixel_near(right_x,right_y,6),"artifact hut seated edge renders "..label)
+ check(pget(mark_x,mark_y)==5 and pget(old_mark_x,old_mark_y)!=5,"artifact hut moves one pixel outward "..label)
+ local pivot_r=sqrt((pivot_x-x)*(pivot_x-x)+(pivot_y-y)*(pivot_y-y))
+ local old_pivot_r=sqrt((old_pivot_x-x)*(old_pivot_x-x)+(old_pivot_y-y)*(old_pivot_y-y))
+ check(abs(pivot_r-old_pivot_r-1)<0.01,"artifact hut pivot moves one pixel outward "..label)
+ local contact=0
+ for i=0,4 do
+  local scale=1-i/8
+  local jx,jy=artifact_point(a,x,y,-7*scale,-9*scale)
+  if pget(jx,jy)!=0 then contact+=1 end
+ end
+ check(contact==5,"artifact hut keeps surface contact "..label)
+end
+
 function visible_particle_count()
  local count=0
  for p in all(ship.particles) do
@@ -360,6 +404,69 @@ function _init()
  a.rot=0.25
  local ax1,ay1=artifact_point(a,cx,cy,0,-10)
  check(abs(ax0-ax1)>5 and abs(ay0-ay1)>5,"artifact rotation")
+
+ a.rot=0
+ a.col=12
+ a.off=false
+ a.size=32
+ cls()
+ draw_artifact(a,cx,cy)
+ local lower_cross=0
+ local upper_cross=0
+ local stray_width=0
+ local hut_pixels=0
+ local beacon_pixels=0
+ for py=cy-30,cy-20 do
+  for px=cx-3,cx+3 do
+   if pget(px,py)==12 then lower_cross+=1 end
+  end
+ end
+ for py=cy-39,cy-31 do
+  for px=cx-3,cx+3 do
+   if pget(px,py)==12 then upper_cross+=1 end
+  end
+ end
+ for py=cy-44,cy-23 do
+  for px=cx-24,cx+24 do
+   if abs(px-cx)>12 and pget(px,py)==12 then stray_width+=1 end
+  end
+ end
+ for py=cy-19,cy-4 do
+  for px=cx-17,cx+2 do
+   if pget(px,py)==6 or pget(px,py)==5 then hut_pixels+=1 end
+  end
+ end
+ for py=cy-47,cy-43 do
+  for px=cx-2,cx+2 do
+   if pget(px,py)==10 then beacon_pixels+=1 end
+  end
+ end
+ check(lower_cross>0 and upper_cross>0,"artifact crossed lattice renders")
+ check(stray_width==0,"artifact tower keeps tapered silhouette")
+ check(hut_pixels>30,"artifact surface hut is solid")
+ check(beacon_pixels>=13,"artifact beacon is materially enlarged")
+
+ local new_beacon_x,new_beacon_y=artifact_point(a,cx,cy,0,-45)
+ local old_beacon_x,old_beacon_y=artifact_point(a,cx,cy,0,-48)
+ local hut_d=sqrt(130)
+ local hut_dx,hut_dy=-7/hut_d,-9/hut_d
+ local hut_pivot_x,hut_pivot_y=-7+hut_dx,-9+hut_dy
+ local new_hut_x,new_hut_y=artifact_hut_point(a,cx,cy,-7+hut_dx,-11+hut_dy,hut_pivot_x,hut_pivot_y)
+ local old_hut_x,old_hut_y=artifact_hut_point(a,cx,cy,-7+hut_dx,-14+hut_dy,hut_pivot_x,hut_pivot_y)
+ check(pget(new_beacon_x,new_beacon_y)==10 and pget(old_beacon_x,old_beacon_y)!=10,"artifact beacon moves inward upright")
+ check(pixel_near(new_hut_x,new_hut_y,6) and pget(old_hut_x,old_hut_y)!=6,"artifact hut moves inward upright")
+ check_hut_radial(a,cx,cy,"upright")
+
+ a.rot=0.125
+ cls()
+ draw_artifact(a,cx,cy)
+ new_beacon_x,new_beacon_y=artifact_point(a,cx,cy,0,-45)
+ old_beacon_x,old_beacon_y=artifact_point(a,cx,cy,0,-48)
+ new_hut_x,new_hut_y=artifact_hut_point(a,cx,cy,-7+hut_dx,-11+hut_dy,hut_pivot_x,hut_pivot_y)
+ old_hut_x,old_hut_y=artifact_hut_point(a,cx,cy,-7+hut_dx,-14+hut_dy,hut_pivot_x,hut_pivot_y)
+ check(pget(new_beacon_x,new_beacon_y)==10 and pget(old_beacon_x,old_beacon_y)!=10,"artifact beacon moves inward rotated")
+ check(pixel_near(new_hut_x,new_hut_y,6) and pget(old_hut_x,old_hut_y)!=6,"artifact hut moves inward rotated")
+ check_hut_radial(a,cx,cy,"rotated")
 
  printh("starfield smoke: passed")
  extcmd("shutdown")

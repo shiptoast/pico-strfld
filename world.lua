@@ -139,22 +139,82 @@ function artifact_point(a,x,y,px,py)
  return x+rx,y+ry
 end
 
+function artifact_tower_line(a,x,y,x1,y1,x2,y2,col)
+ local ax,ay=artifact_point(a,x,y,x1,y1)
+ local bx,by=artifact_point(a,x,y,x2,y2)
+ line(ax,ay,bx,by,col)
+end
+
+function artifact_hut_point(a,x,y,px,py,pivot_x,pivot_y)
+ local d=sqrt(pivot_x*pivot_x+pivot_y*pivot_y)
+ local ca=-pivot_y/d
+ local sa=-pivot_x/d
+ local dx=px-pivot_x
+ local dy=py-pivot_y
+ local hx=pivot_x+dx*ca+dy*sa
+ local hy=pivot_y-dx*sa+dy*ca
+ return artifact_point(a,x,y,hx,hy)
+end
+
+function artifact_hut_line(a,x,y,x1,y1,x2,y2,pivot_x,pivot_y,col)
+ local ax,ay=artifact_hut_point(a,x,y,x1,y1,pivot_x,pivot_y)
+ local bx,by=artifact_hut_point(a,x,y,x2,y2,pivot_x,pivot_y)
+ line(ax,ay,bx,by,col)
+end
+
+function artifact_hut_fill(a,x,y,x1,y1,x2,y2,pivot_x,pivot_y,col)
+ for py=y1,y2 do
+  artifact_hut_line(a,x,y,x1,py,x2,py,pivot_x,pivot_y,col)
+  if py<y2 then artifact_hut_line(a,x,y,x1,py+0.5,x2,py+0.5,pivot_x,pivot_y,col) end
+ end
+end
+
+function draw_artifact_tower(a,x,y,r)
+ local c=a.col
+ local inward=3
+
+ -- tapered legs and two crossed lattice bays
+ artifact_tower_line(a,x,y,-r/2,-r+inward,0,-3*r+inward,c)
+ artifact_tower_line(a,x,y,r/2,-r+inward,0,-3*r+inward,c)
+ artifact_tower_line(a,x,y,-r/2,-r+inward,r/2,-r+inward,c)
+ artifact_tower_line(a,x,y,-3*r/8,-3*r/2+inward,3*r/8,-3*r/2+inward,c)
+ artifact_tower_line(a,x,y,-r/4,-2*r+inward,r/4,-2*r+inward,c)
+ artifact_tower_line(a,x,y,-r/8,-5*r/2+inward,r/8,-5*r/2+inward,c)
+ artifact_tower_line(a,x,y,-r/2,-r+inward,3*r/8,-3*r/2+inward,c)
+ artifact_tower_line(a,x,y,r/2,-r+inward,-3*r/8,-3*r/2+inward,c)
+ artifact_tower_line(a,x,y,-3*r/8,-3*r/2+inward,r/4,-2*r+inward,c)
+ artifact_tower_line(a,x,y,3*r/8,-3*r/2+inward,-r/4,-2*r+inward,c)
+ artifact_tower_line(a,x,y,-r/4,-2*r+inward,r/8,-5*r/2+inward,c)
+ artifact_tower_line(a,x,y,r/4,-2*r+inward,-r/8,-5*r/2+inward,c)
+
+ -- solid shaded surface hut from the original tower
+ local house=a.off and 5 or 6
+ local roof=a.off and 1 or 5
+ local base_pivot_x=-7*r/16
+ local base_pivot_y=-3*r/4+inward
+ local pivot_d=sqrt(base_pivot_x*base_pivot_x+base_pivot_y*base_pivot_y)
+ local hut_dx=base_pivot_x/pivot_d
+ local hut_dy=base_pivot_y/pivot_d
+ local pivot_x=base_pivot_x+hut_dx
+ local pivot_y=base_pivot_y+hut_dy
+ artifact_hut_fill(a,x,y,-3*r/4+hut_dx,-r+inward+hut_dy,-r/8+hut_dx,-3*r/4+inward+hut_dy,pivot_x,pivot_y,house)
+ for py=-5*r/4+inward,-r+inward do
+  local spread=(py+5*r/4-inward)*7/4
+  artifact_hut_line(a,x,y,-7*r/16-spread+hut_dx,py+hut_dy,-7*r/16+spread+hut_dx,py+hut_dy,pivot_x,pivot_y,roof)
+ end
+ artifact_hut_fill(a,x,y,-5*r/8+hut_dx,-15*r/16+inward+hut_dy,-r/2+hut_dx,-7*r/8+inward+hut_dy,pivot_x,pivot_y,0)
+ artifact_hut_fill(a,x,y,-5*r/16+hut_dx,-15*r/16+inward+hut_dy,-3*r/16+hut_dx,-3*r/4+inward+hut_dy,pivot_x,pivot_y,c)
+
+ local tx,ty=artifact_point(a,x,y,0,-3*r+inward)
+ circfill(tx,ty,2,a.off and 5 or 10)
+end
+
 function draw_artifact(a,x,y)
  local r=max(8,min(22,a.size/2))
  circfill(x,y,r,0)
  circfill(x,y,r-1,a.col)
  circfill(x,y,max(2,r-5),a.off and 1 or 7)
- local blx,bly=artifact_point(a,x,y,-r/2,-r)
- local brx,bry=artifact_point(a,x,y,r/2,-r)
- local lx,ly=artifact_point(a,x,y,-2*r,-2*r)
- local rx,ry=artifact_point(a,x,y,2*r,-2*r)
- local tx,ty=artifact_point(a,x,y,0,-3*r)
- line(blx,bly,lx,ly,a.col)
- line(brx,bry,rx,ry,a.col)
- line(lx,ly,rx,ry,a.col)
- line(lx,ly,tx,ty,a.col)
- line(rx,ry,tx,ty,a.col)
- circfill(tx,ty,1,a.off and 5 or 10)
+ draw_artifact_tower(a,x,y,r)
 end
 
 function draw_minimap()

@@ -223,10 +223,10 @@ function draw_minimap(now)
  local mx=5+ship.x/world_size*22
  local my=5+ship.y/world_size*22
  now=now or t()
- if flr(now*2)%2==0 then pset(mx,my,9) end
  for a in all(artifacts) do
   if a.visible and not a.off then
    pset(5+a.x/world_size*22,5+a.y/world_size*22,a.col)
   end
  end
+ if flr(now*2)%2==0 then pset(mx,my,9) end
 end

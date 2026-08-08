@@ -300,6 +300,19 @@ function _init()
  end
  check(marker_pixels==0,"minimap ship marker keeps off blink phase")
 
+ local collision=artifacts[1]
+ collision.x=ship.x
+ collision.y=ship.y
+ collision.col=12
+ collision.visible=true
+ collision.off=false
+ cls()
+ draw_minimap(0)
+ check(pget(marker_x,marker_y)==9,"minimap ship marker covers collocated artifact when lit")
+ cls()
+ draw_minimap(0.5)
+ check(pget(marker_x,marker_y)==12,"minimap collocated artifact shows during ship off phase")
+
  game_state=1
  pause_story=false
  ship.orbit=nil

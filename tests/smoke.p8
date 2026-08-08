@@ -278,6 +278,62 @@ function _init()
 
  ship.x=world_size/2
  ship.y=world_size/2
+ ship.target=artifacts[1]
+ ship.target.x=ship.x+100
+ ship.target.y=ship.y
+ radio_offset=ship.target.freq
+ ship.sonar_tick=45
+ ship.sonar_period=90
+ cls()
+ draw_sonar()
+ local sonar_pixels=0
+ local sonar_miny=127
+ local sonar_maxy=0
+ local sonar_left=0
+ for py=0,127 do
+  for px=0,127 do
+   if pget(px,py)==12 then
+    sonar_pixels+=1
+    sonar_miny=min(sonar_miny,py)
+    sonar_maxy=max(sonar_maxy,py)
+    if px<cx then sonar_left+=1 end
+   end
+  end
+ end
+ check(sonar_pixels>45 and sonar_maxy-sonar_miny>24,"sonar renders broad bubble arcs")
+ check(sonar_left==0,"sonar stays target-directed")
+ for i=0,2 do
+  local d=((0.5+i/3)%1)*26+8
+  check(pixel_near(cx+d,cy,12),"sonar renders successive arc fronts")
+ end
+ ship.target.x=ship.x
+ ship.target.y=ship.y+100
+ cls()
+ draw_sonar()
+ local sonar_minx=127
+ local sonar_maxx=0
+ local sonar_above=0
+ for py=0,127 do
+  for px=0,127 do
+   if pget(px,py)==12 then
+    sonar_minx=min(sonar_minx,px)
+    sonar_maxx=max(sonar_maxx,px)
+    if py<cy then sonar_above+=1 end
+   end
+  end
+ end
+ check(sonar_maxx-sonar_minx>24 and sonar_above==0,"sonar arcs follow turned target bearing")
+ ship.target=nil
+ cls()
+ draw_sonar()
+ sonar_pixels=0
+ for py=0,127 do
+  for px=0,127 do
+   if pget(px,py)==12 then sonar_pixels+=1 end
+  end
+ end
+ check(sonar_pixels==0,"sonar clears without a target")
+
  for a in all(artifacts) do a.visible=false end
  local marker_x=5+ship.x/world_size*22
  local marker_y=5+ship.y/world_size*22

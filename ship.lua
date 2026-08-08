@@ -201,9 +201,11 @@ function draw_sonar()
  local phase=ship.sonar_tick/max(1,ship.sonar_period)
  for i=0,2 do
   local d=((phase+i/3)%1)*26+8
-  local jitter=(rnd(1)-0.5)*0.04
-  local x=cx+cos(ang+jitter)*d
-  local y=cy+sin(ang+jitter)*d
-  circ(x,y,1,12)
+  for j=-3,3 do
+   local sweep=j/36
+   local x=cx+cos(ang+sweep)*d
+   local y=cy+sin(ang+sweep)*d
+   circ(x,y,1,12)
+  end
  end
 end

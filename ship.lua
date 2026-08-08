@@ -192,6 +192,20 @@ function draw_particles()
  end
 end
 
+function sonar_front_distance(age)
+ return age*18+8
+end
+
+function draw_sonar_front(ang,d,i,col)
+ local stagger=(i-1)/3
+ for j=-3,3 do
+  local sweep=(j+stagger)/36
+  local x=cx+cos(ang+sweep)*d
+  local y=cy+sin(ang+sweep)*d
+  circ(x,y,1,col or 12)
+ end
+end
+
 function draw_sonar()
  if not ship.target or radio_offset==0 then return end
  local a=ship.target
@@ -200,13 +214,7 @@ function draw_sonar()
  local ang=atan2(dx,dy)
  local phase=ship.sonar_tick/max(1,ship.sonar_period)
  for i=0,2 do
-  local d=((phase+i/3)%1)*26+8
-  local stagger=(i-1)*0.5
-  for j=-3,3 do
-   local sweep=(j+stagger)/36
-   local x=cx+cos(ang+sweep)*d
-   local y=cy+sin(ang+sweep)*d
-   circ(x,y,1,12)
-  end
+  local age=(phase+i/3)%1
+  draw_sonar_front(ang,sonar_front_distance(age),i)
  end
 end

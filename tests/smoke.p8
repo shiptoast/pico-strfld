@@ -290,8 +290,6 @@ function _init()
  local sonar_miny=127
  local sonar_maxy=0
  local sonar_left=0
- local front_sum={0,0,0}
- local front_count={0,0,0}
  for py=0,127 do
   for px=0,127 do
    if pget(px,py)==12 then
@@ -299,29 +297,39 @@ function _init()
     sonar_miny=min(sonar_miny,py)
     sonar_maxy=max(sonar_maxy,py)
     if px<cx then sonar_left+=1 end
-    local rd=dist2(cx,cy,px,py)
-    for i=0,2 do
-     local d=((0.5+i/3)%1)*26+8
-     if abs(rd-d)<1.5 then
-      front_sum[i+1]+=py
-      front_count[i+1]+=1
-     end
-    end
    end
   end
  end
  check(sonar_pixels>45 and sonar_maxy-sonar_miny>24,"sonar renders broad bubble arcs")
  check(sonar_left==0,"sonar stays target-directed")
- local front_mean={}
  for i=0,2 do
-  local d=((0.5+i/3)%1)*26+8
-  local sweep=(i-1)/72
+  local d=sonar_front_distance((0.5+i/3)%1)
+  local sweep=(i-1)/108
   local front_x=cx+cos(sweep)*d
   local front_y=cy+sin(sweep)*d
   check(pixel_near(front_x,front_y,12),"sonar renders staggered successive arc fronts")
-  front_mean[i+1]=front_sum[i+1]/max(1,front_count[i+1])
  end
- check(front_mean[1]>front_mean[2] and front_mean[2]>front_mean[3],"sonar blips offset between arc fronts")
+ check(sonar_front_distance(0.6)-sonar_front_distance(0.5)<2,"sonar fronts travel slowly")
+ for first=0,1 do
+  for second=first+1,2 do
+   cls()
+   draw_sonar_front(0,48,first,12)
+   local before=0
+   for py=0,127 do
+    for px=0,127 do
+     if pget(px,py)==12 then before+=1 end
+    end
+   end
+   draw_sonar_front(0,48,second,11)
+   local after=0
+   for py=0,127 do
+    for px=0,127 do
+     if pget(px,py)==12 then after+=1 end
+    end
+   end
+   check(after==before,"sonar fronts avoid shared angular columns")
+  end
+ end
  ship.target.x=ship.x
  ship.target.y=ship.y+100
  cls()

@@ -49,6 +49,7 @@ files.
 - `radio.lua`: tuning, signal selection, proximity, and artifact interaction.
 - `main.lua`: cartridge lifecycle and draw ordering.
 - `tests/smoke.p8`: cartridge-level progression and regression coverage.
+- `tests/finale.p8`: focused final-checkpoint and two-ship trail coverage.
 - `docs/overview.md`: design, architecture, and validation details.
 - `app/`: original Ruby/Gosu source and media, retained for provenance.
 
@@ -66,6 +67,9 @@ SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy \
 
 timeout 8s env SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy \
   "$PICO8_BIN" -run tests/smoke.p8
+
+timeout 8s env SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy \
+  "$PICO8_BIN" -run tests/finale.p8
 ```
 
 The smoke cartridge covers repeated checkpoint advances and their cap, coherent
@@ -75,6 +79,7 @@ orbit momentum, four cardinal orbit headings, one natural artifact shutdown,
 both radio tuning directions, autopilot engagement/disengagement, the finale cue
 and transition, ship accents, artifact rotation, and basic flight input. A passing run prints
 `starfield smoke: passed` before shutting down.
+The focused finale cartridge prints `starfield finale: passed`.
 
 Before publishing a release, export and test from the exact commit being
 released, then verify both generated-file hashes and a desktop/touch browser

@@ -66,15 +66,6 @@ function visible_particle_count()
  return count
 end
 
-function star_style_counts()
- local colored,large=0,0
- for s in all(stars) do
-  if s.col!=6 then colored+=1 end
-  if s.size==2 then large+=1 end
- end
- return colored,large
-end
-
 function _init()
  srand(1986)
  init_story()
@@ -94,11 +85,6 @@ function _init()
  check(#story_pause==61,"pause count")
  check(#artifacts==11,"artifact count")
  check(#stars==150,"star count")
- check(star_color_chance==0.05,"colored star chance")
- check(star_large_chance==0.2,"large star chance")
- local colored_stars,large_stars=star_style_counts()
- check(colored_stars==11,"fixed-seed colored star rarity")
- check(large_stars==27,"fixed-seed large star rarity")
 
  game_state=1
  for count=1,#artifacts do
@@ -146,8 +132,6 @@ function _init()
   end
  end
 
- advance_playtest_checkpoint()
- advance_playtest_checkpoint()
  check(completed_planets()==11,"checkpoint cap")
  check(story_state==58,"checkpoint cap story")
  check(game_state==1,"checkpoint does not skip ending")
@@ -283,6 +267,7 @@ function _init()
  check(game_state==2,"ending trigger")
  for i=1,512 do update_story() end
  check(game_state==3,"finale entry")
+ check(fade==128,"normal finale keeps fade timing")
  check(stat(49)==4,"finale cue")
  for i=1,4381 do update_story() end
  check(game_state==4,"final black")

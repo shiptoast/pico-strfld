@@ -79,6 +79,7 @@ story_pause={
 
 radio_cues={8,15,20,23,27,31,34,38,43,49,55}
 artifact_cues={12,18,22,25,29,33,37,41,46,52,57}
+music_tracks={0}
 
 function in_list(list,v)
  for n in all(list) do

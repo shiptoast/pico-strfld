@@ -4,6 +4,7 @@ function _init()
  init_ship()
  init_world()
  init_radio()
+ init_music_menu()
  refresh_playtest_menu()
 end
 

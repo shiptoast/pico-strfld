@@ -17,8 +17,8 @@ development lives in the cartridge and Lua files at the repository root.
   Autopilot also disengages when the ship reaches a planet interaction.
 - O / X: turn the radio dial counterclockwise / clockwise (tune up / down).
 - Down: advance dialogue or shut down an artifact while in close orbit.
-- Title screen, `music: off`: press Left / Right to audition a looping track.
-  Starting the game stops the music.
+- Title screen music: press Up to reveal the hidden selector, then Left / Right
+  to audition a looping track. Starting the game stops the music.
 - Pause menu, `checkpoint N/11`: advance the playtest state by one completed
   planet, capped at all eleven. This is a testing shortcut, not story input;
   human and agent playtesters can use it to reach later story beats quickly.

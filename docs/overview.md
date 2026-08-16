@@ -36,8 +36,9 @@ artifact discovery instead.
   Autopilot also disengages when the ship reaches a planet interaction.
 - O / X: turn the radio dial counterclockwise / clockwise (tune up / down).
 - Down: advance story or shut down an artifact while in close orbit.
-- Title menu music: Left / Right selects `off` or a looping track. The selected
-  track is audible while browsing and stops when Down begins the game.
+- Title menu music: Up reveals a hidden selector; Left / Right then selects
+  `off` or a looping track. The selected track is audible while browsing and
+  stops when Down begins the game.
 - Pause menu: advance the playtest checkpoint through all eleven completed
   planets, then advance once beyond the apparent maximum to `CHECKPOINT 12/11`
   for the visible two-ship ending. The 11/11 position still leaves the radio-off

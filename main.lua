@@ -10,6 +10,7 @@ end
 
 function _update60()
  update_story()
+ update_music_menu()
  update_radio()
  update_ship()
  update_world()
@@ -55,5 +56,6 @@ function _draw()
   draw_radio()
  end
  draw_story()
+ draw_music_menu()
  draw_fade()
 end

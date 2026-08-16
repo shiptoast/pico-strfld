@@ -13,23 +13,27 @@ end
 
 function _init()
  reload(0x3100,0x3100,0x1200,"../starfield.p8")
+ game_state=0
  init_music_menu()
- check(music_track==0 and music_menu_label()=="music: off","music menu starts off")
- check(change_music_track(2) and music_track==1,"right selects track one")
+ check(music_track==0 and music_menu_label()=="music: off","title menu starts off")
+ select_music_track(1)
+ check(music_track==1,"right selects track one")
  check(music_menu_label()=="music: track 1","music track label")
  check(stat(54)==0 and stat(57),"track starts at pattern zero")
- check(change_music_track(2) and music_track==0,"right wraps to off")
+ select_music_track(2)
+ check(music_track==0,"right wraps to off")
  check(not stat(57),"off stops music")
- check(change_music_track(1) and music_track==1,"left wraps to track one")
- check(change_music_track(4) and music_track==1,"select keeps menu open")
+ select_music_track(-1)
+ check(music_track==1,"left wraps to track one")
  patterns_played=stat(55)
 end
 
 function _update()
  if stat(55)>patterns_played then
   check(stat(54)==0 and stat(57),"track loops to pattern zero")
-  change_music_track(1)
-  check(music_track==0 and not stat(57),"left returns to off")
+  game_state=1
+  update_music_menu()
+  check(music_track==0 and not stat(57),"gameplay stops title music")
   printh("starfield music: passed")
   extcmd("shutdown")
  end

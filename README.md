@@ -17,8 +17,8 @@ development lives in the cartridge and Lua files at the repository root.
   Autopilot also disengages when the ship reaches a planet interaction.
 - O / X: turn the radio dial counterclockwise / clockwise (tune up / down).
 - Down: advance dialogue or shut down an artifact while in close orbit.
-- Pause menu, `music: off`: press Left / Right to choose a looping track;
-  leave the pause menu to keep listening during play.
+- Title screen, `music: off`: press Left / Right to audition a looping track.
+  Starting the game stops the music.
 - Pause menu, `checkpoint N/11`: advance the playtest state by one completed
   planet, capped at all eleven. This is a testing shortcut, not story input;
   human and agent playtesters can use it to reach later story beats quickly.
@@ -49,11 +49,11 @@ files.
 - `world.lua`: stars, artifacts, shutdown state, rendering, and minimap.
 - `ship.lua`: flight, orbit, particles, ship art, and sonar.
 - `radio.lua`: tuning, signal selection, proximity, and artifact interaction.
-- `music.lua`: pause-menu music selection and playback.
+- `music.lua`: title-menu music selection and playback.
 - `main.lua`: cartridge lifecycle and draw ordering.
 - `tests/smoke.p8`: cartridge-level progression and regression coverage.
 - `tests/finale.p8`: focused final-checkpoint and two-ship trail coverage.
-- `tests/music.p8`: pause-menu selection and full-loop playback coverage.
+- `tests/music.p8`: title-menu selection, full-loop, and gameplay-stop coverage.
 - `docs/overview.md`: design, architecture, and validation details.
 - `app/`: original Ruby/Gosu source and media, retained for provenance.
 

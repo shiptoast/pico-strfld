@@ -1,6 +1,12 @@
 function init_music_menu()
  music_track=0
  music_menu_visible=false
+ music_sfx_words={}
+ for s=1,4 do
+  for note=0,31 do
+   add(music_sfx_words,peek2(0x3200+s*68+note*2))
+  end
+ end
  music(-1)
 end
 
@@ -10,8 +16,39 @@ end
 
 function select_music_track(n)
  music_track=n%(#music_tracks+1)
- if music_track==0 then music(-1)
- else music(music_tracks[music_track]) end
+ if music_track==0 then
+  music(-1)
+  restore_music_sfx()
+ else
+  boost_music_sfx()
+  music(music_tracks[music_track])
+ end
+end
+
+function boost_music_sfx()
+ local i=1
+ for s=1,4 do
+  for note=0,31 do
+   local addr=0x3200+s*68+note*2
+   local packed=music_sfx_words[i]
+   local volume=(packed>>9)&7
+   if volume>0 then
+    packed=(packed&0xf1ff)|(min(7,volume+2)<<9)
+   end
+   poke2(addr,packed)
+   i+=1
+  end
+ end
+end
+
+function restore_music_sfx()
+ local i=1
+ for s=1,4 do
+  for note=0,31 do
+   poke2(0x3200+s*68+note*2,music_sfx_words[i])
+   i+=1
+  end
+ end
 end
 
 function show_music_menu()
@@ -24,6 +61,7 @@ function update_music_menu()
   if music_track!=0 then
    music_track=0
    music(-1)
+   restore_music_sfx()
   end
   return
  end

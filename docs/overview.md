@@ -38,7 +38,10 @@ artifact discovery instead.
 - Down: advance story or shut down an artifact while in close orbit.
 - Title menu music: Up reveals a hidden selector; Left / Right then selects
   `off` or a looping track. The selected track is audible while browsing and
-  stops when Down begins the game.
+  stops when Down begins the game. Title playback temporarily raises each
+  nonzero music note by two volume steps (capped at seven), preserving the
+  authored dynamics, then restores the original SFX data so gameplay cues
+  retain their authored levels.
 - Pause menu: advance the playtest checkpoint through all eleven completed
   planets, then advance once beyond the apparent maximum to `CHECKPOINT 12/11`
   for the visible two-ship ending. The 11/11 position still leaves the radio-off

@@ -4,11 +4,13 @@ function _init()
  init_ship()
  init_world()
  init_radio()
+ init_music_menu()
  refresh_playtest_menu()
 end
 
 function _update60()
  update_story()
+ update_music_menu()
  update_radio()
  update_ship()
  update_world()
@@ -54,5 +56,6 @@ function _draw()
   draw_radio()
  end
  draw_story()
+ draw_music_menu()
  draw_fade()
 end

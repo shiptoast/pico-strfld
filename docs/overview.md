@@ -24,6 +24,7 @@ artifact discovery instead.
   engine particles, ship art, and directional sonar.
 - `radio.lua`: tuning, static, signal selection/strength, map reveal, approach
   detection, and artifact interaction.
+- `music.lua`: title-menu track selection and looping playback.
 - `main.lua`: PICO-8 lifecycle, draw ordering, HUD, and dithered fades.
 - `starfield.html` and `starfield.js`: generated browser export.
 - `app/`: untouched original Ruby/Gosu source and media.
@@ -35,6 +36,9 @@ artifact discovery instead.
   Autopilot also disengages when the ship reaches a planet interaction.
 - O / X: turn the radio dial counterclockwise / clockwise (tune up / down).
 - Down: advance story or shut down an artifact while in close orbit.
+- Title menu music: Up reveals a hidden selector; Left / Right then selects
+  `off` or a looping track. The selected track is audible while browsing and
+  stops when Down begins the game.
 - Pause menu: advance the playtest checkpoint through all eleven completed
   planets, then advance once beyond the apparent maximum to `CHECKPOINT 12/11`
   for the visible two-ship ending. The 11/11 position still leaves the radio-off
@@ -84,6 +88,9 @@ timeout 8s env SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy \
 
 timeout 8s env SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy \
   "$PICO8_BIN" -run tests/finale.p8
+
+timeout 10s env SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy \
+  "$PICO8_BIN" -run tests/music.p8
 ```
 
 ## Parity notes

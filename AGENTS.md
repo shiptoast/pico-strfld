@@ -10,7 +10,8 @@ uses `starfield.p8` as its cartridge wrapper and includes, in order:
 3. `world.lua`
 4. `ship.lua`
 5. `radio.lua`
-6. `main.lua`
+6. `music.lua`
+7. `main.lua`
 
 Treat `starfield.js` as generated. Gameplay changes belong in the included
 Lua files; regenerate `starfield.html` and `starfield.js` afterward with the
